@@ -110,13 +110,13 @@ export default function ContactPage() {
           ))}
         </div>
 
-        <div className="lg:px-8 border-primary bg-primary/10 border rounded-2xl p-8 shadow-lg space-y-8">
+        <div className=" border-primary bg-primary/10 border rounded-2xl p-4 lg:p-8 shadow-lg space-y-8">
           {/* Contact Form */}
           <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-primary">
               Send us a message
             </h2>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-text-main">
               Fill out the form below and we'll get back to you within 24 hours.
             </p>
 
@@ -132,7 +132,7 @@ export default function ContactPage() {
               <Input
                 label="Email"
                 type="email"
-                name="email"
+                name="email"  
                 value={formData.email}
                 onChange={handleInputChange}
                 required

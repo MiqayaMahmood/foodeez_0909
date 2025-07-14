@@ -37,16 +37,16 @@ const ShareExperience = () => {
       </div>
       {/* CTA Button Below Banner */}
       <div className="px-4 lg:px-0 text-center">
-        <div className="my-12 inline-flex items-center justify-center gap-4">
+        <div className="my-12 inline-flex items-center justify-center gap-4" >
           {hasMore && (
-            <Link href="/food-journey" passHref>
+            <Link href="/food-journey" passHref target="_blank">
               <button className="btn-primary">
                 See More Food Journey Stories
               </button>
             </Link>
           )}
 
-          <Link href="/food-journey#shareFoodJourneyStory" passHref>
+          <Link href="/food-journey#shareFoodJourneyStory" passHref target="_blank">
             <button className="btn-secondary">
               Share Your Food Journey Experience
             </button>

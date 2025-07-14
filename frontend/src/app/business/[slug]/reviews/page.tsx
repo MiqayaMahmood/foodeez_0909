@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import {
   business_detail_view_all,
@@ -6,7 +7,8 @@ import {
 } from "@prisma/client";
 import {
   getBusinessById,
-  getBusinessReviews,
+  // getBusinessReviews,
+  getBusinessReviewsForUser,
 } from "@/services/BusinessProfilePageService";
 import { Skeleton } from "@/components/ui/skeleton";
 import Banner from "@/components/core/Banner";
@@ -51,8 +53,13 @@ export default function AllFoodeezReviewsPage() {
         setBusiness(mapped as unknown as any);
 
         // Fetch business reviews
-        const businessReviews = await getBusinessReviews(
-          Number(mapped.BUSINESS_ID)
+        let userId: number | undefined = undefined;
+        if (session?.user?.id) {
+          userId = Number(session.user.id);
+        }
+        const businessReviews = await getBusinessReviewsForUser(
+          Number(mapped.BUSINESS_ID),
+          userId
         );
         setReviews(businessReviews);
       } else {
@@ -64,7 +71,7 @@ export default function AllFoodeezReviewsPage() {
     }
 
     fetchBusiness();
-  }, [businessId]);
+  }, [businessId, session]);
 
   // Helper for address
   const getFullAddress = (b: business_detail_view_all | null | undefined) => {
@@ -252,6 +259,7 @@ export default function AllFoodeezReviewsPage() {
                     key={review.VISITOR_BUSINESS_REVIEW_ID}
                     review={review}
                     onEdit={() => handleEditReview(review)}
+                    onDelete={(reviewId) => setReviews(reviews => reviews.filter(r => r.VISITOR_BUSINESS_REVIEW_ID !== reviewId))}
                   />
                 ))}
               </div>

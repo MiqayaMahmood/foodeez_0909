@@ -109,6 +109,7 @@ const authOptions: NextAuthOptions = {
         });
 
         if (user) {
+          session.user.id = `${user.VISITORS_ACCOUNT_ID}`
           session.user.name = `${user.FIRST_NAME} ${user.LAST_NAME}`;
           session.user.image = user.PIC;
         }

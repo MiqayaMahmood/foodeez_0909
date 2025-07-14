@@ -22,12 +22,12 @@ export default function FoodeezReviews({
   genSlug,
   business,
 }: FoodeezReviewsProps) {
+  const { data: session } = useSession();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftButton, setShowLeftButton] = useState(false);
   const [showRightButton, setShowRightButton] = useState(true);
   const [likeCounts, setLikeCounts] = useState<{ [id: number]: number }>({});
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const { data: session } = useSession();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [editingReview, setEditingReview] = useState<visitor_business_review_view | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -39,18 +39,8 @@ export default function FoodeezReviews({
   >([]);
 
   useEffect(() => {
-    const filtered = reviews.filter((review) => {
-      if (review.APPROVED) {
-        return true;
-      }
-      // if (session?.user?.email && review.EMAIL_ADDRESS === session.user.email) {
-      //   return true;
-      // }
-      return false;
-    });
-
     // Sort by creation date descending
-    const sorted = filtered.sort((a, b) => {
+    const sorted = reviews.sort((a, b) => {
       const dateA = a.CREATION_DATETIME
         ? new Date(a.CREATION_DATETIME).getTime()
         : 0;

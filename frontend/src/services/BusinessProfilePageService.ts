@@ -29,21 +29,37 @@ export async function getBusinessById(id: number) {
   }
 }
 
-export async function getBusinessReviews(businessId: number) {
+export async function getBusinessReviewsForUser(businessId: number, userId?: number) {
+  console.log(`User Id ${userId}`)
   try {
+    const whereClause: any = {
+      BUSINESS_ID: businessId,
+      OR: [
+        { APPROVED: 1 },
+      ],
+    };
+    if (userId) {
+      whereClause.OR.push({ VISITORS_ACCOUNT_ID: userId });
+    }
     const reviews = await prisma.visitor_business_review_view.findMany({
-      where: {
-        BUSINESS_ID: businessId,
-        APPROVED: 1,
-      },
+      where: whereClause,
       orderBy: {
         CREATION_DATETIME: "desc",
       },
     });
-
+    // If userId is provided, filter out duplicates (user's own review may be both approved and unapproved)
+    if (userId) {
+      const seen = new Set();
+      return reviews.filter(r => {
+        const key = r.VISITOR_BUSINESS_REVIEW_ID;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
     return reviews;
   } catch (error) {
-    console.error("[getBusinessReviews] Failed to fetch reviews:", error);
+    console.error("[getBusinessReviewsForUser] Failed to fetch reviews:", error);
     return [];
   }
 }

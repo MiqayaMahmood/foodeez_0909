@@ -2,9 +2,6 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
 
 export async function POST(request: Request) {
   try {
@@ -16,12 +13,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const formData = await request.formData();
-    const businessId = formData.get('businessId');
-    const rating = formData.get('rating');
-    const remarks = formData.get('remarks');
-    const images = formData.getAll('images');
-    const video = formData.get('video');
+    const body = await request.json();
+    const { businessId, rating, remarks, picUrls, videoUrl } = body;
 
     // Validate required fields
     if (!businessId || !rating || !remarks) {
@@ -31,42 +24,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Handle file uploads
-    const imageUrls: string[] = [];
-    if (images && images.length > 0) {
-      for (const img of images) {
-        if (typeof img === 'object' && 'arrayBuffer' in img) {
-          const buffer = Buffer.from(await img.arrayBuffer());
-          const uploadDir = join(process.cwd(), 'public', 'uploads', 'review-images');
-          if (!existsSync(uploadDir)) {
-            await mkdir(uploadDir, { recursive: true });
-          }
-          const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.jpg`;
-          const filePath = join(uploadDir, filename);
-          await writeFile(filePath, buffer);
-          imageUrls.push(`/uploads/review-images/${filename}`);
-        }
-      }
-    }
-
-    let videoUrl: string | null = null;
-    if (video && typeof video === 'object' && 'arrayBuffer' in video) {
-      const buffer = Buffer.from(await video.arrayBuffer());
-      const uploadDir = join(process.cwd(), 'public', 'uploads', 'review-videos');
-      if (!existsSync(uploadDir)) {
-        await mkdir(uploadDir, { recursive: true });
-      }
-      const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.mp4`;
-      const filePath = join(uploadDir, filename);
-      await writeFile(filePath, buffer);
-      videoUrl = `/uploads/review-videos/${filename}`;
-    }
-
     // Save review to DB
     const user = await prisma.visitors_account.findUnique({
       where: { EMAIL_ADDRESS: session.user.email },
     });
-    
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
@@ -74,10 +35,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Map images to PIC_1...PIC_10
+    // Map picUrls to PIC_1...PIC_10
     const picFields: { [key: string]: string | undefined } = {};
     for (let i = 0; i < 10; i++) {
-      picFields[`PIC_${i + 1}`] = imageUrls[i] || undefined;
+      picFields[`PIC_${i + 1}`] = picUrls && picUrls[i] ? picUrls[i] : undefined;
     }
 
     const review = await prisma.visitor_business_review.create({
@@ -144,12 +105,8 @@ export async function PUT(request: Request) {
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const formData = await request.formData();
-    const reviewId = formData.get('reviewId');
-    const remarks = formData.get('remarks');
-    const rating = formData.get('rating');
-    const images = formData.getAll('images');
-    const video = formData.get('video');
+    const body = await request.json();
+    const { reviewId, remarks, rating, picUrls, videoUrl } = body;
     if (!reviewId) {
       return NextResponse.json({ error: 'Missing reviewId' }, { status: 400 });
     }
@@ -167,39 +124,10 @@ export async function PUT(request: Request) {
     if (!user || Number(review.VISITORS_ACCOUNT_ID) !== Number(user.VISITORS_ACCOUNT_ID)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    // Handle file uploads (optional, similar to POST)
-    const imageUrls: string[] = [];
-    if (images && images.length > 0) {
-      for (const img of images) {
-        if (typeof img === 'object' && 'arrayBuffer' in img) {
-          const buffer = Buffer.from(await img.arrayBuffer());
-          const uploadDir = join(process.cwd(), 'public', 'uploads', 'review-images');
-          if (!existsSync(uploadDir)) {
-            await mkdir(uploadDir, { recursive: true });
-          }
-          const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.jpg`;
-          const filePath = join(uploadDir, filename);
-          await writeFile(filePath, buffer);
-          imageUrls.push(`/uploads/review-images/${filename}`);
-        }
-      }
-    }
-    let videoUrl: string | null = null;
-    if (video && typeof video === 'object' && 'arrayBuffer' in video) {
-      const buffer = Buffer.from(await video.arrayBuffer());
-      const uploadDir = join(process.cwd(), 'public', 'uploads', 'review-videos');
-      if (!existsSync(uploadDir)) {
-        await mkdir(uploadDir, { recursive: true });
-      }
-      const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.mp4`;
-      const filePath = join(uploadDir, filename);
-      await writeFile(filePath, buffer);
-      videoUrl = `/uploads/review-videos/${filename}`;
-    }
-    // Map images to PIC_1...PIC_10
+    // Map picUrls to PIC_1...PIC_10
     const picFields: { [key: string]: string | undefined } = {};
     for (let i = 0; i < 10; i++) {
-      picFields[`PIC_${i + 1}`] = imageUrls[i] || undefined;
+      picFields[`PIC_${i + 1}`] = picUrls && picUrls[i] ? picUrls[i] : undefined;
     }
     const updated = await prisma.visitor_business_review.update({
       where: { VISITOR_BUSINESS_REVIEW_ID: Number(reviewId) },

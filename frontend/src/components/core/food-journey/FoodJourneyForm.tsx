@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import Input from "../Input";
 
 interface FoodJourneyFormProps {
   form: {
@@ -33,21 +34,22 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
   success,
 }) => {
   return (
-    <div className=" px-4 lg:px-0">
+    <div className="border border-primary  rounded-2xl p-4 lg:p-8 bg-primary/10">
       <form
         onSubmit={onSubmit}
-        className="bg-primary/10 rounded-2xl shadow-lg p-8 sm:p-10 space-y-6"
+        className="bg-white rounded-2xl shadow-lg p-8 sm:p-10 space-y-6"
       >
         <div className="space-y-10">
           {/* Title */}
           <div className="flex flex-col">
             <label className="font-semibold mb-1">Title</label>
-            <input
+            <Input
               type="text"
               name="TITLE"
               value={form.TITLE}
               onChange={onInputChange}
-              className="border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="E.g : Shawarma in Switzerland? This One Changed the Game"
               required
             />
           </div>
@@ -55,12 +57,12 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
           {/* Restaurant Name */}
           <div className="flex flex-col">
             <label className="font-semibold mb-1">Restaurant Name</label>
-            <input
+            <Input
               type="text"
               name="RESTAURANT_NAME"
               value={form.RESTAURANT_NAME}
               onChange={onInputChange}
-              className="border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
@@ -70,12 +72,12 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
             <label className="font-semibold mb-1">
               Google Maps URL <span className="text-gray-500">(optional)</span>
             </label>
-            <input
+            <Input
               type="url"
               name="ADDRESS_GOOGLE_URL"
               value={form.ADDRESS_GOOGLE_URL}
               onChange={onInputChange}
-              className="border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 
@@ -87,7 +89,7 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
               value={form.DESCRIPTION}
               onChange={onInputChange}
               rows={5}
-              className="border rounded-md px-4 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              className="border border-gray-300 rounded-md px-4 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
@@ -97,7 +99,7 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
             <label className="font-semibold mb-1">
               Upload Images (up to 3)
             </label>
-            <input
+            <Input
               type="file"
               accept="image/*"
               multiple

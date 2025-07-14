@@ -16,9 +16,10 @@ interface FoodeezReviewCardProps {
   review: visitor_business_review_view;
   likeCount?: number;
   onEdit?: () => void;
+  onDelete?: (reviewId: number) => void;
 }
 
-const getReviewImages = (review: visitor_business_review_view) => {
+const getReviewImages = (review: visitor_business_review_view ) => {
   return [
     review.PIC_1,
     review.PIC_2,
@@ -37,6 +38,7 @@ export default function FoodeezReviewCard({
   review,
   likeCount,
   onEdit,
+  onDelete,
 }: FoodeezReviewCardProps) {
   const [showGallery, setShowGallery] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -53,7 +55,6 @@ export default function FoodeezReviewCard({
   const { data: session } = useSession();
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [deleted, setDeleted] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
@@ -119,7 +120,7 @@ export default function FoodeezReviewCard({
       });
       const data = await res.json();
       if (data.success) {
-        setDeleted(true);
+        if (onDelete) onDelete(review.VISITOR_BUSINESS_REVIEW_ID);
         setShowDeleteModal(false);
       }
     } catch (e) {
@@ -137,8 +138,6 @@ export default function FoodeezReviewCard({
       setShowEditModal(true);
     }
   };
-
-  if (deleted) return null;
 
   return (
     <Card className="w-full rounded-2xl border-2 border-gray-200 bg-white p-5 lg:p-6 shadow-md hover:shadow-lg transition-all flex flex-col h-full">

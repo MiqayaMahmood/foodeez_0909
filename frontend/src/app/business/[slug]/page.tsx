@@ -20,12 +20,15 @@ import ResturantProfilePageHeader from "./components/ResturantProfilePageHeader"
 import FoodeezReviews from "./components/FoodeezReviews";
 import {
   getBusinessById,
-  getBusinessReviews,
+  getBusinessReviewsForUser,
 } from "@/services/BusinessProfilePageService";
 import { visitor_business_review_view } from "@prisma/client";
 import Separator from "@/components/ui/separator";
+import { useSession } from "next-auth/react";
 
 const BusinessDetailPage = () => {
+  const { data: session } = useSession();
+
   const [business, setBusiness] = useState<BusinessDetail | null>(null);
   const [placeId, setPlaceId] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -49,11 +52,11 @@ const BusinessDetailPage = () => {
 
       const mapped = data
         ? Object.fromEntries(
-            Object.entries(data).map(([k, v]) => [
-              k,
-              v === null ? undefined : v,
-            ])
-          )
+          Object.entries(data).map(([k, v]) => [
+            k,
+            v === null ? undefined : v,
+          ])
+        )
         : null;
 
       if (mapped && mapped.BUSINESS_ID) {
@@ -65,9 +68,13 @@ const BusinessDetailPage = () => {
         );
         setPlaceId(placeId);
 
-        // Fetch business reviews
-        const businessReviews = await getBusinessReviews(
-          Number(mapped.BUSINESS_ID)
+        let userId: number | undefined = undefined;
+        if (session?.user?.id) {
+          userId = Number(session.user.id);
+        }
+        const businessReviews = await getBusinessReviewsForUser(
+          Number(mapped.BUSINESS_ID),
+          userId
         );
         setReviews(businessReviews);
       } else {
@@ -186,12 +193,12 @@ const BusinessDetailPage = () => {
             }}
           /> */}
 
-         <Separator />
-          
+          <Separator />
+
 
           {/* Reviews */}
-       
-            <div className="">
+
+          <div className="">
             <FoodeezReviews reviews={reviews} genSlug={genSlug} business={business} />
           </div>
           <div className="">

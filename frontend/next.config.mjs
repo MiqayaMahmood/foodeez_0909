@@ -10,6 +10,13 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "shining-fun-cae9b3168c.media.strapiapp.com",
+        port: "",
+        pathname: "/**",
+      },
+
+      {
+        protocol: "https",
         hostname: "picsum.photos",
         port: "",
         pathname: "/**",

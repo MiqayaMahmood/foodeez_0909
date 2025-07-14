@@ -146,4 +146,6 @@ From 5 - 28 April No record
 
 14 june till 12 july record in google sheets
 
+Form now all record will be saved in google sheets
+
 */
