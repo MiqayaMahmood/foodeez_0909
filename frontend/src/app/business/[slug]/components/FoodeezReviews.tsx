@@ -3,26 +3,28 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { visitor_business_review_view } from "@prisma/client";
+import { business_detail_view_all, visitor_business_review_view } from "@prisma/client";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import FoodeezReviewCard from "@/components/core/review/FoodeezReviewCard";
 import ReviewForm from "@/components/core/review/ReviewForm";
 import LoginRequiredModal from "@/components/core/LoginRequiredModal";
 import EditReviewModal from "@/components/core/review/EditReviewModal";
+import { getBusinessReviewsForUser } from "@/services/BusinessProfilePageService";
+import { extractBusinessId } from "@/lib/utils/genSlug";
 
 interface FoodeezReviewsProps {
-  reviews: visitor_business_review_view[];
   genSlug: string;
-  business: any;
+  business: business_detail_view_all;
 }
 
 export default function FoodeezReviews({
-  reviews,
   genSlug,
   business,
 }: FoodeezReviewsProps) {
   const { data: session } = useSession();
+
+  const [reviews, setReviews] = useState<visitor_business_review_view[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftButton, setShowLeftButton] = useState(false);
   const [showRightButton, setShowRightButton] = useState(true);
@@ -31,15 +33,31 @@ export default function FoodeezReviews({
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [editingReview, setEditingReview] = useState<visitor_business_review_view | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [filteredReviews, setFilteredReviews] = useState<
-    visitor_business_review_view[]
-  >([]);
-  const [displayedReviews, setDisplayedReviews] = useState<
-    visitor_business_review_view[]
-  >([]);
+  const [filteredReviews, setFilteredReviews] = useState<visitor_business_review_view[]>([]);
+  const [displayedReviews, setDisplayedReviews] = useState<visitor_business_review_view[]>([]);
+
+  const parsedId = extractBusinessId(genSlug)
+
+   // helper function 
+  const fetchReviews = async () => {
+    let userId: number | undefined = undefined;
+    if (session?.user?.id) {
+      userId = Number(session.user.id);
+    }
+    const businessReviews = await getBusinessReviewsForUser(
+      business.BUSINESS_ID,
+      userId
+    );
+    setReviews(businessReviews);
+  };
 
   useEffect(() => {
-    // Sort by creation date descending
+    fetchReviews();
+  }, [parsedId, session]);
+
+
+  useEffect(() => {
+
     const sorted = reviews.sort((a, b) => {
       const dateA = a.CREATION_DATETIME
         ? new Date(a.CREATION_DATETIME).getTime()
@@ -52,7 +70,7 @@ export default function FoodeezReviews({
 
     setFilteredReviews(sorted);
     setDisplayedReviews(sorted.slice(0, 5));
-  }, [reviews, session]);
+  }, [reviews]);
 
   useEffect(() => {
     const initialLikes: { [id: number]: number } = {};
@@ -90,13 +108,19 @@ export default function FoodeezReviews({
   const handleEditSuccess = () => {
     setShowEditModal(false);
     setEditingReview(null);
-    window.location.reload();
+    fetchReviews()
   };
 
   const handleEditClose = () => {
     setShowEditModal(false);
     setEditingReview(null);
   };
+
+  const handleReviewSuccess = () => {
+    setShowReviewForm(false);
+    fetchReviews(); 
+  };
+
 
   return (
     <div className="relative w-full py-8 px-2 sm:px-4 lg:px-0">
@@ -130,7 +154,7 @@ export default function FoodeezReviews({
           >
             <ReviewForm
               businessId={business?.BUSINESS_ID ?? 0}
-              onSuccess={() => setShowReviewForm(false)}
+              onSuccess={handleReviewSuccess}
             />
           </motion.div>
         )}
@@ -169,6 +193,7 @@ export default function FoodeezReviews({
                   review={review}
                   likeCount={likeCounts[review.VISITOR_BUSINESS_REVIEW_ID]}
                   onEdit={() => handleEditReview(review)}
+                  onDelete={(reviewId) => setReviews(reviews => reviews.filter(r => r.VISITOR_BUSINESS_REVIEW_ID !== reviewId))}
                 />
               </motion.div>
             ))

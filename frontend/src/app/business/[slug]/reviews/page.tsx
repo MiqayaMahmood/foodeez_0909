@@ -36,41 +36,34 @@ export default function AllFoodeezReviewsPage() {
   const [editingReview, setEditingReview] = useState<visitor_business_review_view | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  useEffect(() => {
-    async function fetchBusiness() {
+  // helper function 
+  async function fetchBusiness() {
+    try {
       const data = await getBusinessById(Number(businessId));
+      setBusiness(data as business_detail_view_all);
 
-      const mapped = data
-        ? Object.fromEntries(
-            Object.entries(data).map(([k, v]) => [
-              k,
-              v === null ? undefined : v,
-            ])
-          )
-        : null;
-
-      if (mapped && mapped.BUSINESS_ID) {
-        setBusiness(mapped as unknown as any);
-
-        // Fetch business reviews
-        let userId: number | undefined = undefined;
-        if (session?.user?.id) {
-          userId = Number(session.user.id);
-        }
-        const businessReviews = await getBusinessReviewsForUser(
-          Number(mapped.BUSINESS_ID),
-          userId
-        );
-        setReviews(businessReviews);
-      } else {
-        setBusiness(null);
-        setReviews([]);
-      }
-
+    } catch (error) {
+      console.error("Error fetching business:", error);
+    } finally {
       setLoading(false);
     }
+  }
+  // helper function 
+  const fetchReviews = async () => {
+    let userId: number | undefined = undefined;
+    if (session?.user?.id) {
+      userId = Number(session.user.id);
+    }
+    const businessReviews = await getBusinessReviewsForUser(
+      businessId,
+      userId
+    );
+    setReviews(businessReviews);
+  };
 
-    fetchBusiness();
+  useEffect(() => {
+    fetchBusiness()
+    fetchReviews();
   }, [businessId, session]);
 
   // Helper for address
@@ -94,8 +87,7 @@ export default function AllFoodeezReviewsPage() {
   const handleEditSuccess = () => {
     setShowEditModal(false);
     setEditingReview(null);
-    // Refresh the reviews data to show the updated review
-    window.location.reload();
+    fetchReviews()
   };
 
   const handleEditClose = () => {
@@ -103,39 +95,9 @@ export default function AllFoodeezReviewsPage() {
     setEditingReview(null);
   };
 
-  const handleReviewSuccess = (newReviewData?: any) => {
+  const handleReviewSuccess = () => {
     setShowReviewForm(false);
-    
-    if (newReviewData && session?.user) {
-      // Create a review object that matches the visitor_business_review_view structure
-      const newReview: visitor_business_review_view = {
-        VISITOR_BUSINESS_REVIEW_ID: newReviewData.VISITOR_BUSINESS_REVIEW_ID,
-        CREATION_DATETIME: new Date(newReviewData.CREATION_DATETIME),
-        VISITORS_ACCOUNT_ID: newReviewData.VISITORS_ACCOUNT_ID,
-        FIRST_NAME: session.user.name?.split(' ')[0] || null,
-        LAST_NAME: session.user.name?.split(' ').slice(1).join(' ') || null,
-        PIC: session.user.image || null,
-        BUSINESS_ID: newReviewData.BUSINESS_ID,
-        RATING: newReviewData.RATING,
-        REMARKS: newReviewData.REMARKS,
-        PIC_1: newReviewData.PIC_1,
-        PIC_2: newReviewData.PIC_2,
-        PIC_3: newReviewData.PIC_3,
-        PIC_4: newReviewData.PIC_4,
-        PIC_5: newReviewData.PIC_5,
-        PIC_6: newReviewData.PIC_6,
-        PIC_7: newReviewData.PIC_7,
-        PIC_8: newReviewData.PIC_8,
-        PIC_9: newReviewData.PIC_9,
-        PIC_10: newReviewData.PIC_10,
-        VIDEO_1: newReviewData.VIDEO_1,
-        LIKE_COUNT: newReviewData.LIKE_COUNT,
-        APPROVED: newReviewData.APPROVED,
-      };
-      
-      // Add the new review to the beginning of the list
-      setReviews(prev => [newReview, ...prev]);
-    }
+    fetchReviews()
   };
 
   return (
@@ -232,7 +194,7 @@ export default function AllFoodeezReviewsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
-                
+
                 >
                   <ReviewForm
                     businessId={business?.BUSINESS_ID ?? 0}

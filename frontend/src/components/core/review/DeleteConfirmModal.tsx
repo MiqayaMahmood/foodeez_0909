@@ -18,7 +18,7 @@ const DeleteConfirmModal = ({
   loading = false,
   isOpen,
 }: DeleteConfirmModalProps) => {
-  // Allow ESC key to close
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onCancel();
@@ -38,7 +38,7 @@ const DeleteConfirmModal = ({
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white rounded-2xl shadow-xl p-6 w-[90%] max-w-2xl  relative"
+              className="bg-white rounded-2xl shadow-xl p-6 w-[90%] max-w-md  relative"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}  
               exit={{ scale: 0.9, opacity: 0 }}

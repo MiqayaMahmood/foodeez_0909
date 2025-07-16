@@ -1,10 +1,10 @@
 import { SocialLinks } from "@/components/core/SocialLinks";
 import { MapPin, Phone, Globe } from "lucide-react";
-import { BusinessDetail } from "@/types/business.types";
 import Link from "next/link";
 import FoodTypeBadges from "@/components/core/FoodTypeBadges";
+import { business_detail_view_all } from "@prisma/client";
 
-const BusinessInfoSection: React.FC<{ business: BusinessDetail, genSlug: string }> = ({
+const BusinessInfoSection: React.FC<{ business: business_detail_view_all, genSlug: string }> = ({
   business,
   genSlug,
 }) => {

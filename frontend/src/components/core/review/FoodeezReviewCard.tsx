@@ -19,7 +19,7 @@ interface FoodeezReviewCardProps {
   onDelete?: (reviewId: number) => void;
 }
 
-const getReviewImages = (review: visitor_business_review_view ) => {
+const getReviewImages = (review: visitor_business_review_view) => {
   return [
     review.PIC_1,
     review.PIC_2,
@@ -106,7 +106,7 @@ export default function FoodeezReviewCard({
   // Check if current user is the owner
   const isOwner = Boolean(
     session?.user?.id &&
-      Number(session.user.id) === Number(review.VISITORS_ACCOUNT_ID)
+    Number(session.user.id) === Number(review.VISITORS_ACCOUNT_ID)
   );
 
   // Delete handler
