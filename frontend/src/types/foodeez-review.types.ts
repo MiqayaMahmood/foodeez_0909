@@ -1,17 +1,3 @@
-export interface FoodeezReview {
-  FOODEEZ_REVIEW_ID: bigint;
-  CREATION_DATETIME: Date | null;
-  REVIEWER_NAME: string | null;
-  REVIEWER_EMAIL: string | null;
-  AVATAR: string | null;
-  RATING: number | null;
-  REVIEW: string | null;
-  PIC_1: string | null;
-  PIC_2: string | null;
-  PIC_3: string | null;
-  APPROVED: number | null;
-}
-
 export interface CreateFoodeezReviewData {
   REVIEWER_NAME?: string;
   REVIEWER_EMAIL?: string;

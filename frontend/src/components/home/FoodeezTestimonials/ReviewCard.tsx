@@ -5,13 +5,13 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Edit, Star, Trash } from "lucide-react";
-import { FoodeezReview } from "@/types/foodeez-review.types";
 import { formatDistanceToNow } from "date-fns";
+import { foodeez_review_view } from "@prisma/client";
 
 interface ReviewCardProps {
-  review: FoodeezReview;
+  review: foodeez_review_view;
   isOwner?: boolean;
-  onEdit?: (review: FoodeezReview) => void;
+  onEdit?: (review: foodeez_review_view) => void;
   onDelete?: (id: string) => void;
 }
 

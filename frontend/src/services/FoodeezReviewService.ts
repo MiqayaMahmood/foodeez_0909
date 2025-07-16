@@ -1,4 +1,5 @@
-import { FoodeezReview, CreateFoodeezReviewData, UpdateFoodeezReviewData } from '@/types/foodeez-review.types';
+import { CreateFoodeezReviewData, UpdateFoodeezReviewData } from '@/types/foodeez-review.types';
+import { foodeez_review_view } from '@prisma/client';
 
 const API_BASE = '/api/foodeez-reviews';
 
@@ -7,7 +8,7 @@ export class FoodeezReviewService {
     approved?: number;
     limit?: number;
     offset?: number;
-  }): Promise<FoodeezReview[]> {
+  }): Promise<foodeez_review_view[]> {
     const searchParams = new URLSearchParams();
     if (params?.approved !== undefined) searchParams.append('approved', params.approved.toString());
     if (params?.limit) searchParams.append('limit', params.limit.toString());
@@ -17,10 +18,11 @@ export class FoodeezReviewService {
     if (!response.ok) {
       throw new Error('Failed to fetch reviews');
     }
+    console.log(`Reviews Foodeez ${response}`)
     return response.json();
   }
 
-  static async getReview(id: string): Promise<FoodeezReview> {
+  static async getReview(id: string): Promise<foodeez_review_view> {
     const response = await fetch(`${API_BASE}/${id}`);
     if (!response.ok) {
       throw new Error('Failed to fetch review');
@@ -28,7 +30,7 @@ export class FoodeezReviewService {
     return response.json();
   }
 
-  static async createReview(data: CreateFoodeezReviewData): Promise<FoodeezReview> {
+  static async createReview(data: CreateFoodeezReviewData): Promise<foodeez_review_view> {
     const response = await fetch(API_BASE, {
       method: 'POST',
       headers: {
@@ -45,7 +47,7 @@ export class FoodeezReviewService {
     return response.json();
   }
 
-  static async updateReview(id: string, data: UpdateFoodeezReviewData): Promise<FoodeezReview> {
+  static async updateReview(id: string, data: UpdateFoodeezReviewData): Promise<foodeez_review_view> {
     const response = await fetch(`${API_BASE}/${id}`, {
       method: 'PUT',
       headers: {
@@ -73,20 +75,4 @@ export class FoodeezReviewService {
     }
   }
 
-  static async uploadImage(file: File): Promise<string> {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await fetch('/api/upload-profile-image', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to upload image');
-    }
-
-    const data = await response.json();
-    return data.imageUrl;
-  }
 } 

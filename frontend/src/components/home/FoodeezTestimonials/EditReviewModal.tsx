@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FoodeezReview } from '@/types/foodeez-review.types';
 import ReviewForm from './ReviewForm';
+import { foodeez_review_view } from '@prisma/client';
 
 interface EditReviewModalProps {
-  review: FoodeezReview | null;
+  review: foodeez_review_view | null;
   isOpen: boolean;
   onClose: () => void;
   onUpdate: () => void;
@@ -58,6 +58,7 @@ const EditReviewModal: React.FC<EditReviewModalProps> = ({
                   images: [],
                 }}
                 isEditing={true}
+                reviewId={review.FOODEEZ_REVIEW_ID?.toString()}
                 onSubmit={handleSubmit}
                 onCancel={onClose}
               />

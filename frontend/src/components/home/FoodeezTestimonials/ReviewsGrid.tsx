@@ -2,14 +2,14 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FoodeezReview } from "@/types/foodeez-review.types";
 import ReviewCard from "./ReviewCard";
 import { useSession } from "next-auth/react";
+import { foodeez_review_view } from "@prisma/client";
 
 interface ReviewsGridProps {
-  reviews: FoodeezReview[];
+  reviews: foodeez_review_view[];
   isLoading?: boolean;
-  onEdit?: (review: FoodeezReview) => void;
+  onEdit?: (review: foodeez_review_view) => void;
   onDelete?: (id: string) => void;
   showUserReviews?: boolean;
 }
@@ -23,7 +23,7 @@ const ReviewsGrid: React.FC<ReviewsGridProps> = ({
 }) => {
   const { data: session } = useSession();
 
-  const isOwner = (review: FoodeezReview) => {
+  const isOwner = (review: foodeez_review_view) => {
     return session?.user?.email === review.REVIEWER_EMAIL;
   };
 

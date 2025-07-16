@@ -5,22 +5,22 @@ import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/core/Button";
 import { Plus, Award } from "lucide-react";
-import { FoodeezReview } from "@/types/foodeez-review.types";
 import { FoodeezReviewService } from "@/services/FoodeezReviewService";
+import { foodeez_review_view } from "@prisma/client";
 import ReviewsGrid from "./ReviewsGrid";
-import ReviewForm from "./ReviewForm";
 import EditReviewModal from "./EditReviewModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+import ReviewFormModal from "./ReviewFormModal";
 import LoginRequiredModal from "@/components/core/LoginRequiredModal";
 
 const TestimonialsSection: React.FC = () => {
   const { data: session } = useSession();
 
-  const [reviews, setReviews] = useState<FoodeezReview[]>([]);
-  const [filteredReviews, setFilteredReviews] = useState<FoodeezReview[]>([]);
+  const [reviews, setReviews] = useState<foodeez_review_view[]>([]);
+  const [filteredReviews, setFilteredReviews] = useState<foodeez_review_view[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [editingReview, setEditingReview] = useState<FoodeezReview | null>(
+  const [editingReview, setEditingReview] = useState<foodeez_review_view | null>(
     null
   );
   const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
@@ -72,7 +72,7 @@ const TestimonialsSection: React.FC = () => {
     setShowForm(false);
   };
 
-  const handleReviewEdit = (review: FoodeezReview) => {
+  const handleReviewEdit = (review: foodeez_review_view) => {
     setEditingReview(review);
   };
 
@@ -134,23 +134,11 @@ const TestimonialsSection: React.FC = () => {
           </div>
 
         {/* Review Form Modal */}
-        {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            >
-              <div className="p-6">
-                <ReviewForm
-                  onSubmit={handleReviewSubmit}
-                  onCancel={() => setShowForm(false)}
-                />
-              </div>
-            </motion.div>
-          </div>
-        )}
+        <ReviewFormModal
+          show={showForm}
+          onSubmit={handleReviewSubmit}
+          onCancel={() => setShowForm(false)}
+        />
 
         {/* Edit Review Modal */}
         <EditReviewModal

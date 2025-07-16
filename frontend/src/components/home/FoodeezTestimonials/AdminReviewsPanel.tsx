@@ -5,10 +5,10 @@ import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/core/Button';
 import { Shield, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
-import { FoodeezReview } from '@/types/foodeez-review.types';
 import { FoodeezReviewService } from '@/services/FoodeezReviewService';
 import ReviewsFilter from './ReviewsFilter';
 import { SortOption, FilterOption } from './ReviewsFilter';
+import { foodeez_review_view } from '@prisma/client';
 
 interface AdminReviewsPanelProps {
   isVisible: boolean;
@@ -20,8 +20,8 @@ const AdminReviewsPanel: React.FC<AdminReviewsPanelProps> = ({
   onToggle,
 }) => {
   const { data: session } = useSession();
-  const [reviews, setReviews] = useState<FoodeezReview[]>([]);
-  const [filteredReviews, setFilteredReviews] = useState<FoodeezReview[]>([]);
+  const [reviews, setReviews] = useState<foodeez_review_view[]>([]);
+  const [filteredReviews, setFilteredReviews] = useState<foodeez_review_view[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [filterBy, setFilterOption] = useState<FilterOption>('all');

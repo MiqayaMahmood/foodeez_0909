@@ -14,6 +14,7 @@ interface ReviewFormProps {
   onCancel?: () => void;
   initialData?: ReviewFormData;
   isEditing?: boolean;
+  reviewId?: string; // Added for editing
 }
 
 const ReviewForm: React.FC<ReviewFormProps> = ({
@@ -21,6 +22,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
   onCancel,
   initialData,
   isEditing = false,
+  reviewId, // Added for editing
 }) => {
   const { data: session } = useSession();
   const [formData, setFormData] = useState<ReviewFormData>({
@@ -153,7 +155,13 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
         // PIC_3: imageUrls[2] || undefined,
       };
 
-      await FoodeezReviewService.createReview(reviewData);
+      if (isEditing && reviewId) {
+        // Call update API
+        await FoodeezReviewService.updateReview(reviewId, reviewData);
+      } else {
+        // Call create API
+        await FoodeezReviewService.createReview(reviewData);
+      }
 
       // Reset form
       setFormData({
