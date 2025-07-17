@@ -11,7 +11,6 @@ import ReviewsGrid from "./ReviewsGrid";
 import EditReviewModal from "./EditReviewModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import ReviewFormModal from "./ReviewFormModal";
-import LoginRequiredModal from "@/components/core/LoginRequiredModal";
 
 const TestimonialsSection: React.FC = () => {
   const { data: session } = useSession();
@@ -25,7 +24,6 @@ const TestimonialsSection: React.FC = () => {
   );
   const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
   // const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Load reviews on component mount
   useEffect(() => {
@@ -116,22 +114,18 @@ const TestimonialsSection: React.FC = () => {
           onDelete={handleReviewDelete}
         />
 
-         {/* Action Buttons */}
-         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
-            <Button
-              onClick={() => {
-                if (!session) {
-                  setShowAuthModal(true);
-                } else {
-                  setShowForm((prev) => !prev);
-                }
-              }}
-              className=""
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Share Your Experience With Foodeez
-            </Button>
-          </div>
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
+          <Button
+            onClick={() => {
+              setShowForm((prev) => !prev);
+            }}
+            className=""
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Share Your Experience With Foodeez
+          </Button>
+        </div>
 
         {/* Review Form Modal */}
         <ReviewFormModal
@@ -154,13 +148,6 @@ const TestimonialsSection: React.FC = () => {
           isOpen={!!deletingReviewId}
           onClose={() => setDeletingReviewId(null)}
           onDelete={handleReviewDeleteConfirm}
-        />
-
-        {/* Login Required Modal */}
-        <LoginRequiredModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          message="Please log in to share your experience with Foodeez."
         />
       </div>
     </section>

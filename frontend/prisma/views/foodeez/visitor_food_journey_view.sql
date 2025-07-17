@@ -19,7 +19,8 @@ SELECT
   `foodeez`.`visitor_food_journey`.`ADDRESS_GOOGLE_URL` AS `ADDRESS_GOOGLE_URL`,
   `foodeez`.`visitor_food_journey`.`PIC_1` AS `PIC_1`,
   `foodeez`.`visitor_food_journey`.`PIC_2` AS `PIC_2`,
-  `foodeez`.`visitor_food_journey`.`PIC_4` AS `PIC_4`
+  `foodeez`.`visitor_food_journey`.`PIC_3` AS `PIC_3`,
+  `foodeez`.`visitor_food_journey`.`APPROVED` AS `APPROVED`
 FROM
   `foodeez`.`visitor_food_journey`
 ORDER BY

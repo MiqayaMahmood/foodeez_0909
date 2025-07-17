@@ -13,7 +13,7 @@ export default function MenuProductCard({ product }: MenuProductCardProps) {
       <div className="aspect-w-4 aspect-h-3 bg-background-card rounded-t-2xl overflow-hidden">
         {product.PIC ? (
           <Image
-            src={`/images/${product.PIC}`}
+            src={product.PIC}
             alt={product.PRODUCT_NAME}
             loading="lazy"
             width={400}
@@ -27,15 +27,15 @@ export default function MenuProductCard({ product }: MenuProductCardProps) {
         )}
       </div>
       <div className="p-4 flex flex-col flex-1">
-       
-          <h3
-            className="font-semibold text-lg lg:text-xl text-primary mb-1 truncate"
-            title={product.PRODUCT_NAME}
-          >
-            {product.PRODUCT_NAME}
-          </h3>
-         
-       
+
+        <h3
+          className="font-semibold text-lg lg:text-xl text-primary mb-1 truncate"
+          title={product.PRODUCT_NAME}
+        >
+          {product.PRODUCT_NAME}
+        </h3>
+
+
         <p className="text-sm lg:text-base text-text-muted mb-2 line-clamp-2">
           {product.PRODUCT_DESCRIPTION}
         </p>

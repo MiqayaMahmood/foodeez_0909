@@ -25,4 +25,5 @@ export interface ReviewFormData {
   rating: number;
   review: string;
   images: File[];
+  name: string; 
 }

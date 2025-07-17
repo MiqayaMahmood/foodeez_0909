@@ -56,32 +56,41 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    const body: CreateFoodeezReviewData = await request.json();
+
+    let reviewerName = body.REVIEWER_NAME;
+    let reviewerEmail = body.REVIEWER_EMAIL;
+    let avatar = body.AVATAR;
+
+    if (session?.user?.email) {
+      // If logged in, get user details from DB
+      const user = await prisma.visitors_account.findUnique({
+        where: { EMAIL_ADDRESS: session.user.email }
+      });
+      if (user) {
+        reviewerName = reviewerName || `${user.FIRST_NAME} ${user.LAST_NAME}`;
+        reviewerEmail = reviewerEmail || session.user.email;
+        avatar = user.PIC || "";
+      } else {
+        reviewerEmail = reviewerEmail || session.user.email;
+      }
     }
 
-    const body: CreateFoodeezReviewData = await request.json();
-    
-    // Get user details from database
-    const user = await prisma.visitors_account.findUnique({
-      where: { EMAIL_ADDRESS: session.user.email }
-    });
+    // Ensure reviewerEmail and avatar are never null and are string | undefined
+    const safeReviewerEmail: string | undefined = reviewerEmail ?? undefined;
+    const safeAvatar: string | undefined = avatar ?? undefined;
 
-    if (!user) {
+    if (!reviewerName || reviewerName.trim().length < 2) {
       return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
+        { error: 'Reviewer name is required.' },
+        { status: 400 }
       );
     }
 
     const reviewData = {
-      REVIEWER_NAME: body.REVIEWER_NAME || `${user.FIRST_NAME} ${user.LAST_NAME}`,
-      REVIEWER_EMAIL: body.REVIEWER_EMAIL || session.user.email,
-      AVATAR: body.AVATAR || user.PIC,
+      REVIEWER_NAME: reviewerName.trim(),
+      REVIEWER_EMAIL: safeReviewerEmail,
+      AVATAR: safeAvatar,
       RATING: body.RATING,
       REVIEW: body.REVIEW,
       PIC_1: body.PIC_1,

@@ -465,7 +465,8 @@ model visitor_food_journey {
   ADDRESS_GOOGLE_URL      String?   @db.VarChar(255)
   PIC_1                   String?   @db.VarChar(255)
   PIC_2                   String?   @db.VarChar(255)
-  PIC_4                   String?   @db.VarChar(255)
+  PIC_3                   String?   @db.VarChar(255)
+  APPROVED                Int?      @default(0) @db.TinyInt
 }
 
 view adlink_view {
@@ -746,7 +747,8 @@ view visitor_food_journey_view {
   ADDRESS_GOOGLE_URL      String? @db.VarChar(255)
   PIC_1                   String? @db.VarChar(255)
   PIC_2                   String? @db.VarChar(255)
-  PIC_4                   String? @db.VarChar(255)
+  PIC_3                   String? @db.VarChar(255)
+  APPROVED                Int?    @default(0) @db.TinyInt
 }
 
 view business_having_active_menu_card_view {
