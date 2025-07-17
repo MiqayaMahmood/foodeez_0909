@@ -1,11 +1,11 @@
 import Banner from "@/components/core/Banner";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { getFoodJourney } from "@/services/HomePageService";
 import FoodJourneyCard from "../../core/food-journey/FoodJourneyCard";
 import { visitor_food_journey_view } from "@prisma/client";
+import { getFoodJourney } from "@/services/FoodJourneyService";
 
-const ShareExperience = () => {
+const FoodJourney = () => {
   const [journeys, setJourneys] = useState<visitor_food_journey_view[]>([]);
   const [hasMore, setHasMore] = useState(false);
 
@@ -57,4 +57,4 @@ const ShareExperience = () => {
   );
 };
 
-export default ShareExperience;
+export default FoodJourney;

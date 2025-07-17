@@ -2,11 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import LoginRequiredModal from "@/components/core/LoginRequiredModal";
-import { getFoodJourney } from "@/services/FoodJourney";
+import { getFoodJourney } from "@/services/FoodJourneyService";
 import FoodJourneyForm from "@/components/core/food-journey/FoodJourneyForm";
 import FoodJourneyGrid from "@/components/core/food-journey/FoodJourneyGrid";
 import FoodJourneyPagination from "@/components/core/food-journey/FoodJourneyPagination";
 import FoodJourneyGridSkeleton from "@/components/core/food-journey/FoodJourneyGridSkeleton";
+import { visitor_food_journey_view } from "@prisma/client";
 
 const initialForm = {
   TITLE: "",
@@ -16,19 +17,44 @@ const initialForm = {
   images: [] as File[],
 };
 
+// Add Strapi upload helper
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || '';
+const STRAPI_API_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || '';
+
+async function uploadImagesToStrapi(images: File[]): Promise<string[]> {
+  const uploadedUrls: string[] = [];
+  for (const image of images) {
+    const formData = new FormData();
+    formData.append('files', image);
+    const res = await fetch(`${STRAPI_URL}/api/upload`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${STRAPI_API_TOKEN}`,
+      },
+      body: formData,
+    });
+    if (!res.ok) throw new Error('Failed to upload to Strapi');
+    const data = await res.json();
+    if (data && data[0] && data[0].url) {
+      uploadedUrls.push(data[0].url.startsWith('http') ? data[0].url : `${STRAPI_URL}${data[0].url}`);
+    }
+  }
+  return uploadedUrls;
+}
+
 const FoodJourneyPage = () => {
+  const { data: session } = useSession();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [allStories, setAllStories] = useState<any[]>([]);
+  const [allStories, setAllStories] = useState<visitor_food_journey_view[]>([]);
   const [page, setPage] = useState(1);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const limit = 9;
-  
-  const { data: session } = useSession();
+
   useEffect(() => {
     fetchStories();
   }, []);
@@ -46,7 +72,11 @@ const FoodJourneyPage = () => {
   }, [images]);
 
   const fetchStories = async () => {
-    const data = await getFoodJourney();
+    let userId: number | undefined = undefined;
+    if (session && session.user && session.user.id) {
+      userId = Number(session.user.id);
+    }
+    const data = await getFoodJourney(userId);
     setAllStories(data);
   };
 
@@ -81,10 +111,24 @@ const FoodJourneyPage = () => {
     setSubmitting(true);
 
     try {
+      // Upload images to Strapi first
+      let imageUrls: string[] = [];
+      if (images.length > 0) {
+        imageUrls = await uploadImagesToStrapi(images);
+      }
+      // Prepare form data with image URLs, omitting 'images' field
+      const { images: _omit, ...formRest } = form;
+      const formToSend = {
+        ...formRest,
+        PIC_1: imageUrls[0] || undefined,
+        PIC_2: imageUrls[1] || undefined,
+        PIC_3: imageUrls[2] || undefined,
+      };
+
       const res = await fetch("/api/food-journey", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(formToSend),
       });
 
       if (!res.ok) throw new Error("Failed to submit food journey");

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import FoodJourneyCard from '@/components/core/food-journey/FoodJourneyCard';
-import { getFoodJourneyById } from '@/services/FoodJourney';
+import { getFoodJourneyById } from '@/services/FoodJourneyService';
 import { parseSlug } from '@/lib/utils/genSlug';
 
 const FoodJourneyDetailPage = () => {

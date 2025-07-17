@@ -231,11 +231,11 @@ export default function MobileMenu({
             </div>
             {/* Share Experience */}
             <NavLink
-              href="/share-experience"
+              href="/food-journey"
               onClick={handleNavLinkClick}
               pathname={pathname} // Pass pathname for active link styling
             >
-              Share Your Experience
+              Share Your Food Journey
             </NavLink>
             {/* Profile Section */}
             {isAuthenticated && (

@@ -455,7 +455,7 @@ model top_events {
 model visitor_food_journey {
   VISITOR_FOOD_JOURNEY_ID Int       @id @default(autoincrement())
   CREATION_DATETIME       DateTime? @db.DateTime(0)
-  VISITOR_ID              Int?      @default(0)
+  VISITORS_ACCOUNT_ID     Int?      @default(0)
   VISITOR_NAME            String?   @db.VarChar(100)
   VISITOR_PIC             String?   @db.VarChar(100)
   VISITOR_EMAIL_ADDRESS   String?   @db.VarChar(100)
@@ -737,7 +737,7 @@ view top_events_view {
 
 view visitor_food_journey_view {
   VISITOR_FOOD_JOURNEY_ID Int     @id @default(0)
-  VISITOR_ID              Int?    @default(0)
+  VISITORS_ACCOUNT_ID     Int?    @default(0)
   VISITOR_NAME            String  @default("") @db.VarChar(100)
   VISITOR_PIC             String? @db.VarChar(100)
   VISITOR_EMAIL_ADDRESS   String  @default("") @db.VarChar(100)

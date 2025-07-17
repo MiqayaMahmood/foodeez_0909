@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import Input from "../Input";
+import { Plus } from "lucide-react";
 
 interface FoodJourneyFormProps {
   form: {
@@ -37,7 +38,7 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
     <div className="border border-primary  rounded-2xl p-4 lg:p-8 bg-primary/10">
       <form
         onSubmit={onSubmit}
-        className="bg-white rounded-2xl shadow-lg p-8 sm:p-10 space-y-6"
+        className="bg-white rounded-2xl shadow-lg p-4 sm:p-10 space-y-6"
       >
         <div className="space-y-10">
           {/* Title */}
@@ -99,38 +100,45 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
             <label className="font-semibold mb-1">
               Upload Images (up to 3)
             </label>
-            <Input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={onImageChange}
-              className="border rounded-md px-4 py-2 bg-gray-50 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark"
-              disabled={imagePreviews.length >= 3}
-            />
-            {/* Previews */}
-            {imagePreviews.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
-                {imagePreviews.map((src, idx) => (
-                  <div key={idx} className="relative group">
-                    <Image
-                      src={src}
-                      alt={`Preview ${idx + 1}`}
-                      className="w-full h-24 sm:h-28 object-cover rounded-lg"
-                      width={200}
-                      height={200}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => onRemoveImage(idx)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
-                      aria-label="Remove image"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="flex gap-4">
+              {[0, 1, 2].map((idx) => (
+                <div key={idx} className="relative group w-24 h-36 bg-gray-100 rounded-xl flex items-center justify-center shadow-md overflow-hidden">
+                  {imagePreviews[idx] ? (
+                    <>
+                      <Image
+                        src={imagePreviews[idx]}
+                        alt={`Preview ${idx + 1}`}
+                        className="object-cover w-full h-full rounded-xl"
+                        width={200}
+                        height={300}
+                        style={{ aspectRatio: '3/4' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => onRemoveImage(idx)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow"
+                        aria-label="Remove image"
+                      >
+                        &times;
+                      </button>
+                    </>
+                  ) : (
+                    <label htmlFor={`food-journey-image-${idx}`} className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-400 hover:text-primary transition-colors">
+                      <Plus />
+                      <span className="text-xs">Add Photo</span>
+                      <input
+                        id={`food-journey-image-${idx}`}
+                        type="file"
+                        accept="image/*"
+                        onChange={onImageChange}
+                        className="hidden"
+                        disabled={imagePreviews.length >= 3}
+                      />
+                    </label>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

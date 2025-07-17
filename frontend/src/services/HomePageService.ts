@@ -88,8 +88,8 @@ export async function getBusinessesByLocation({
         VEGAN: true,
         VEGETARIAN: true,
         HALAL: true,
-        CAN_RESERVE_TABLE : true,
-        HAVING_ACTIVE_MENU_CARD : true
+        CAN_RESERVE_TABLE: true,
+        HAVING_ACTIVE_MENU_CARD: true
       }
     });
 
@@ -255,16 +255,6 @@ export async function getFoodeezReview() {
     return reviews;
   } catch (error) {
     console.error('Error fetching Foodeez reviews:', error);
-    return [];
-  }
-}
-
-export async function getFoodJourney() {
-  try {
-    const journey = await prisma.visitor_food_journey_view.findMany({});
-    return journey;
-  } catch (error) {
-    console.error('Error fetching food journey:', error);
     return [];
   }
 }

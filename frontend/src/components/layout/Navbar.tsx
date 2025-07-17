@@ -43,7 +43,7 @@ export const Navbar = () => {
 
   // Nav links
   const navLinks = [
-    { label: "Share your Experience", href: "/share-experience" },
+    { label: "Share your Food Journey", href: "/food-journey" },
   ];
 
   return (

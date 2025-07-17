@@ -1,7 +1,6 @@
 "use client";
 
 import BusinessCTA from "@/components/home/CTAs/BusinessCTA";
-import ShareExperience from "@/components/home/CTAs/ShareExperience";
 // import CtaSection from "@/components/home/CTAs/CtaSection";
 import FaqSection from "@/components/home/FaqSection";
 import HeroSection from "@/components/home/HeroSection";
@@ -18,6 +17,7 @@ import TestimonialsSection from "@/components/home/FoodeezTestimonials/Testimoni
 import Separator from "@/components/ui/separator";
 import CommunitySection from "@/components/home/CommunitySection";
 import UpcomingEvents from "@/components/home/EventSection/UpcomingEvents";
+import FoodJourney from "@/components/home/CTAs/FoodJourney";
 
 export default function Home() {
   return (
@@ -49,8 +49,8 @@ export default function Home() {
       {/* About Section - We Are Foodeez */}
       {/* <AboutSection /> */}
 
-      {/* Share Experience CTA */}
-      <ShareExperience />
+      {/* Food Journey CTA */}
+      <FoodJourney />
 
       <Separator />
 
