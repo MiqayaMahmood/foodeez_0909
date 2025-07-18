@@ -3,9 +3,14 @@ import { visitor_food_journey_view } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import DeleteConfirmModal from "./DeleteConfirmModal";
+import { Edit, Trash } from "lucide-react";
 
 interface FoodJourneyCardProps {
   journey: visitor_food_journey_view;
+  currentUserId?: string;
+  onDelete?: (id: number) => Promise<void>;
+  onEdit?: (story: visitor_food_journey_view) => void;
 }
 
 const getInitials = (name?: string) => {
@@ -15,20 +20,37 @@ const getInitials = (name?: string) => {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 };
 
-const FoodJourneyCard: React.FC<FoodJourneyCardProps> = ({ journey }) => {
+const FoodJourneyCard: React.FC<FoodJourneyCardProps> = ({ journey, currentUserId, onDelete, onEdit }) => {
   const slug = generateSlug(
     journey.TITLE || "food-journey",
     journey.VISITOR_FOOD_JOURNEY_ID
   );
 
-  const foodImages = [journey.PIC_1, journey.PIC_2, journey.PIC_4].filter(
+  const foodImages = [journey.PIC_1, journey.PIC_2, journey.PIC_3].filter(
     Boolean
   );
+
+  // Check if this journey belongs to the current user
+  const isOwner = currentUserId && journey.VISITORS_ACCOUNT_ID && String(journey.VISITORS_ACCOUNT_ID) === String(currentUserId);
+
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      if (onDelete) await onDelete(journey.VISITOR_FOOD_JOURNEY_ID);
+      setShowDeleteModal(false);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <article
       className="rounded-2xl border border-accent bg-white shadow-lg p-5 flex flex-col h-full transition hover:shadow-xl focus-within:ring-2 focus-within:ring-primary"
-      tabIndex={0}
+
       aria-label={`Food journey by ${journey.VISITOR_NAME || "Anonymous"}`}
     >
       {/* Visitor Info */}
@@ -52,26 +74,46 @@ const FoodJourneyCard: React.FC<FoodJourneyCardProps> = ({ journey }) => {
           <h4 className="font-semibold text-primary text-base line-clamp-1">
             {journey.VISITOR_NAME || "Anonymous"}
           </h4>
+
           <p className="text-xs text-gray-500 line-clamp-1">
             {journey.RESTAURANT_NAME || "Unknown Restaurant"}
           </p>
         </div>
+        {/* Owner Actions */}
+        {isOwner && (
+          <div className="flex">
+            <button
+              onClick={() => onEdit && onEdit(journey)}
+              className="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors"
+              title="Edit review"
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="p-2 text-secondary hover:bg-secondary/10 rounded-full transition-colors"
+              title="Delete review"
+            >
+              <Trash className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
-
       {/* Journey Title */}
       <Link
         href={`/food-journey/${slug}`}
-        className="text-xl font-bold text-secondary mb-2 hover:underline focus:underline line-clamp-2"
-        aria-label={`View food journey: ${journey.TITLE}`}
       >
-        {journey.TITLE || "Untitled Food Journey"}
-      </Link>
-        
-      {/* Description */}
-      <p className="text-sm text-gray-700 mb-4 line-clamp-4">
-        {journey.DESCRIPTION || "No description available."}
-      </p>
+        <h3 className="text-xl font-bold text-secondary mb-2 hover:underline focus:underline line-clamp-2"
+          aria-label={`View food journey: ${journey.TITLE}`}
+        >
+          {journey.TITLE || "Untitled Food Journey"}
+        </h3>
 
+        {/* Description */}
+        <p className="text-sm text-gray-700 mb-4 line-clamp-4">
+          {journey.DESCRIPTION || "No description available."}
+        </p>
+      </Link>
       {/* Food Images */}
       <div className="flex flex-wrap gap-2 mt-auto">
         {foodImages.length > 0 ? (
@@ -93,8 +135,16 @@ const FoodJourneyCard: React.FC<FoodJourneyCardProps> = ({ journey }) => {
           </div>
         )}
       </div>
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onCancel={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </article>
   );
 };
 
 export default FoodJourneyCard;
+

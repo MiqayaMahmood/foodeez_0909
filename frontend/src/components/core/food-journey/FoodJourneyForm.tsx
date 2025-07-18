@@ -21,6 +21,7 @@ interface FoodJourneyFormProps {
   submitting: boolean;
   error: string;
   success: string;
+  isEdit?: boolean;
 }
 
 const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
@@ -33,7 +34,22 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
   submitting,
   error,
   success,
+  isEdit = false,
 }) => {
+  // Local state to manage previews (for edit mode)
+  const [localPreviews, setLocalPreviews] = React.useState<string[]>(imagePreviews);
+
+  React.useEffect(() => {
+    setLocalPreviews(imagePreviews);
+  }, [imagePreviews]);
+
+  const handleRemovePreview = (idx: number) => {
+    setLocalPreviews((prev) => prev.filter((_, i) => i !== idx));
+    onRemoveImage(idx);
+  };
+
+  const canAddMore = localPreviews.length < 3;
+
   return (
     <div className="border border-primary  rounded-2xl p-4 lg:p-8 bg-primary/10">
       <form
@@ -43,7 +59,7 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
         <div className="space-y-10">
           {/* Title */}
           <div className="flex flex-col">
-            <label className="font-semibold mb-1">Title</label>
+            <label className="font-semibold mb-1">{isEdit ? 'Edit Title' : 'Title'}</label>
             <Input
               type="text"
               name="TITLE"
@@ -103,10 +119,10 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
             <div className="flex gap-4">
               {[0, 1, 2].map((idx) => (
                 <div key={idx} className="relative group w-24 h-36 bg-gray-100 rounded-xl flex items-center justify-center shadow-md overflow-hidden">
-                  {imagePreviews[idx] ? (
+                  {localPreviews[idx] ? (
                     <>
                       <Image
-                        src={imagePreviews[idx]}
+                        src={localPreviews[idx]}
                         alt={`Preview ${idx + 1}`}
                         className="object-cover w-full h-full rounded-xl"
                         width={200}
@@ -115,14 +131,14 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
                       />
                       <button
                         type="button"
-                        onClick={() => onRemoveImage(idx)}
+                        onClick={() => handleRemovePreview(idx)}
                         className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow"
                         aria-label="Remove image"
                       >
                         &times;
                       </button>
                     </>
-                  ) : (
+                  ) : canAddMore ? (
                     <label htmlFor={`food-journey-image-${idx}`} className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-400 hover:text-primary transition-colors">
                       <Plus />
                       <span className="text-xs">Add Photo</span>
@@ -132,10 +148,10 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
                         accept="image/*"
                         onChange={onImageChange}
                         className="hidden"
-                        disabled={imagePreviews.length >= 3}
+                        disabled={localPreviews.length >= 3}
                       />
                     </label>
-                  )}
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -153,7 +169,7 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
             className="bg-primary hover:bg-primary-dark text-white font-semibold px-8 py-3 rounded-lg transition duration-300 disabled:opacity-50"
             disabled={submitting}
           >
-            {submitting ? "Submitting..." : "Share My Journey"}
+            {submitting ? (isEdit ? "Updating..." : "Submitting...") : (isEdit ? "Update My Journey" : "Share My Journey")}
           </button>
         </div>
       </form>

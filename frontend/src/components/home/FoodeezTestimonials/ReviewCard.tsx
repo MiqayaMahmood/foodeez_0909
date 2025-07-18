@@ -114,7 +114,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
               </button>
               <button
                 onClick={() => onDelete?.(review.FOODEEZ_REVIEW_ID.toString())}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                className="p-2 text-secondary hover:bg-secondary/10 rounded-full transition-colors"
                 title="Delete review"
               >
                 <Trash className="w-4 h-4" />

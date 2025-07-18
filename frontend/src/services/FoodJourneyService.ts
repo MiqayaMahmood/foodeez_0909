@@ -36,13 +36,13 @@ export async function getFoodJourney(userId?: number) {
 }
 
 export async function getFoodJourneyById(id: number) {
-    try {
-        const journey = await prisma.visitor_food_journey_view.findUnique({
-            where: { VISITOR_FOOD_JOURNEY_ID: id },
-        });
-        return journey;
-        } catch (error) {
-        console.error('Error fetching food journey by ID:', error);
-        return null;
-    }
+  try {
+    const journey = await prisma.visitor_food_journey_view.findUnique({
+      where: { VISITOR_FOOD_JOURNEY_ID: id },
+    });
+    return journey;
+  } catch (error) {
+    console.error('Error fetching food journey by ID:', error);
+    return null;
+  }
 }

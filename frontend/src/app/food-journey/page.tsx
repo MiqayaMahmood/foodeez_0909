@@ -1,13 +1,15 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import LoginRequiredModal from "@/components/core/LoginRequiredModal";
-import { getFoodJourney } from "@/services/FoodJourneyService";
+import { getFoodJourney, getFoodJourneyById } from "@/services/FoodJourneyService";
 import FoodJourneyForm from "@/components/core/food-journey/FoodJourneyForm";
 import FoodJourneyGrid from "@/components/core/food-journey/FoodJourneyGrid";
 import FoodJourneyPagination from "@/components/core/food-journey/FoodJourneyPagination";
 import FoodJourneyGridSkeleton from "@/components/core/food-journey/FoodJourneyGridSkeleton";
 import { visitor_food_journey_view } from "@prisma/client";
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const initialForm = {
   TITLE: "",
@@ -42,8 +44,12 @@ async function uploadImagesToStrapi(images: File[]): Promise<string[]> {
   return uploadedUrls;
 }
 
-const FoodJourneyPage = () => {
+export default function FoodJourneyPage() {
+
   const { data: session } = useSession();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
@@ -53,11 +59,52 @@ const FoodJourneyPage = () => {
   const [page, setPage] = useState(1);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [editStory, setEditStory] = useState<visitor_food_journey_view | null>(null);
   const limit = 9;
+
+  const fetchStories = useCallback(async () => {
+    let userId: number | undefined = undefined;
+    if (session?.user?.id) {
+      userId = Number(session.user.id);
+    }
+    const data = await getFoodJourney(userId);
+    setAllStories(data);
+  }, [session]);
 
   useEffect(() => {
     fetchStories();
-  }, []);
+  }, [fetchStories]);
+
+  useEffect(() => {
+    // Check for ?edit=<id> in URL
+    const editId = searchParams.get('edit');
+    if (editId) {
+      (async () => {
+        const data = await getFoodJourneyById(Number(editId));
+        if (data) {
+          setEditStory(data);
+          setForm({
+            TITLE: data.TITLE || '',
+            DESCRIPTION: data.DESCRIPTION || '',
+            RESTAURANT_NAME: data.RESTAURANT_NAME || '',
+            ADDRESS_GOOGLE_URL: data.ADDRESS_GOOGLE_URL || '',
+            images: [],
+          });
+          setImages([]);
+          setImagePreviews([
+            data.PIC_1,
+            data.PIC_2,
+            data.PIC_3
+          ].filter((x): x is string => Boolean(x)));
+          setError('');
+          setSuccess('');
+          setTimeout(() => {
+            document.getElementById('shareFoodJourneyStory')?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
+      })();
+    }
+  }, [searchParams]);
 
   // Generate image previews when images change
   useEffect(() => {
@@ -70,15 +117,6 @@ const FoodJourneyPage = () => {
     // Cleanup
     return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, [images]);
-
-  const fetchStories = async () => {
-    let userId: number | undefined = undefined;
-    if (session && session.user && session.user.id) {
-      userId = Number(session.user.id);
-    }
-    const data = await getFoodJourney(userId);
-    setAllStories(data);
-  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -97,6 +135,30 @@ const FoodJourneyPage = () => {
 
   const handleRemoveImage = (idx: number) => {
     setImages((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  // Edit handler
+  const handleEdit = (story: visitor_food_journey_view) => {
+    setEditStory(story);
+    setForm({
+      TITLE: story.TITLE || '',
+      DESCRIPTION: story.DESCRIPTION || '',
+      RESTAURANT_NAME: story.RESTAURANT_NAME || '',
+      ADDRESS_GOOGLE_URL: story.ADDRESS_GOOGLE_URL || '',
+      images: [], // Images will be handled separately
+    });
+    setImages([]);
+    setImagePreviews([
+      story.PIC_1,
+      story.PIC_2,
+      story.PIC_3
+    ].filter((x): x is string => Boolean(x)));
+    setError('');
+    setSuccess('');
+    // Scroll to form
+    setTimeout(() => {
+      document.getElementById('shareFoodJourneyStory')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -120,28 +182,49 @@ const FoodJourneyPage = () => {
       const { images: _omit, ...formRest } = form;
       const formToSend = {
         ...formRest,
-        PIC_1: imageUrls[0] || undefined,
-        PIC_2: imageUrls[1] || undefined,
-        PIC_3: imageUrls[2] || undefined,
+        PIC_1: imageUrls[0] || (editStory?.PIC_1 ?? undefined),
+        PIC_2: imageUrls[1] || (editStory?.PIC_2 ?? undefined),
+        PIC_3: imageUrls[2] || (editStory?.PIC_3 ?? undefined),
       };
 
-      const res = await fetch("/api/food-journey", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formToSend),
-      });
-
-      if (!res.ok) throw new Error("Failed to submit food journey");
-
-      setSuccess("Your food journey has been submitted for review!");
+      if (editStory) {
+        // Edit mode: update existing story
+        const res = await fetch(`/api/food-journey/${editStory.VISITOR_FOOD_JOURNEY_ID}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formToSend),
+        });
+        if (!res.ok) throw new Error("Failed to update food journey");
+        setSuccess("Your food journey has been updated!");
+        setEditStory(null);
+      } else {
+        // Create mode
+        const res = await fetch("/api/food-journey", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formToSend),
+        });
+        if (!res.ok) throw new Error("Failed to submit food journey");
+        setSuccess("Your food journey has been submitted for review!");
+      }
       setForm(initialForm);
       setImages([]);
       fetchStories();
-      
     } catch (err: any) {
       setError(err.message || "Failed to submit food journey");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Delete handler
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await fetch(`/api/food-journey/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete food journey');
+      fetchStories();
+    } catch (err) {
+      alert('Failed to delete food journey');
     }
   };
 
@@ -157,7 +240,7 @@ const FoodJourneyPage = () => {
         <FoodJourneyGridSkeleton />
       ) : (
         <>
-          <FoodJourneyGrid stories={paginatedStories} />
+          <FoodJourneyGrid stories={paginatedStories} currentUserId={session?.user?.id} onDelete={handleDelete} onEdit={handleEdit} />
           {total > limit && (
             <FoodJourneyPagination
               page={page}
@@ -181,6 +264,7 @@ const FoodJourneyPage = () => {
         submitting={submitting}
         error={error}
         success={success}
+        isEdit={!!editStory}
       />
       <LoginRequiredModal
         isOpen={showLoginModal}
@@ -190,4 +274,3 @@ const FoodJourneyPage = () => {
   );
 };
 
-export default FoodJourneyPage;

@@ -6,15 +6,23 @@ import Image from 'next/image';
 import FoodJourneyCard from '@/components/core/food-journey/FoodJourneyCard';
 import { getFoodJourneyById } from '@/services/FoodJourneyService';
 import { parseSlug } from '@/lib/utils/genSlug';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import DeleteConfirmModal from '@/components/core/review/DeleteConfirmModal';
 
 const FoodJourneyDetailPage = () => {
   const params = useParams();
   const { id } = parseSlug(params.slug as string | string[] | undefined);
 
+  const { data: session } = useSession();
+  const router = useRouter();
+
   const [story, setStory] = useState<any>(null);
   const [related, setRelated] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewImg, setPreviewImg] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -31,6 +39,30 @@ const FoodJourneyDetailPage = () => {
   if (loading || !story) return <FoodJourneyDetailSkeleton />;
 
   const images = [story.PIC_1, story.PIC_2, story.PIC_4].filter(Boolean);
+  const isOwner = session?.user?.id && story.VISITORS_ACCOUNT_ID && String(story.VISITORS_ACCOUNT_ID) === String(session.user.id);
+
+  const handleEdit = () => {
+    router.push(`/food-journey?edit=${story.VISITOR_FOOD_JOURNEY_ID}`);
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        document.getElementById('shareFoodJourneyStory')?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 300);
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/food-journey/${story.VISITOR_FOOD_JOURNEY_ID}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete food journey');
+      setShowDeleteModal(false);
+      router.push('/food-journey');
+    } catch (err) {
+      alert('Failed to delete food journey');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <>
@@ -46,6 +78,31 @@ const FoodJourneyDetailPage = () => {
         <h1 className="text-3xl md:text-5xl font-extrabold text-primary mb-6 text-center break-words">
           {story.TITLE}
         </h1>
+        {/* Owner Actions */}
+        {isOwner && (
+          <div className="flex justify-center gap-4 mb-6">
+            <button
+              onClick={handleEdit}
+              className="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors"
+              title="Edit your food journey"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="p-2 text-secondary hover:bg-secondary/10 rounded-full transition-colors"
+              title="Delete your food journey"
+            >
+              Delete
+            </button>
+          </div>
+        )}
+        <DeleteConfirmModal
+          isOpen={showDeleteModal}
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={handleDelete}
+          loading={deleting}
+        />
         {/* Image Gallery */}
         <div className="flex flex-wrap gap-4 justify-center mb-8">
           {images.map((img: string, idx: number) => (
