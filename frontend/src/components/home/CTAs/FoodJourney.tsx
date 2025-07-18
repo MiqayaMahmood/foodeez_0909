@@ -1,23 +1,55 @@
 import Banner from "@/components/core/Banner";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import FoodJourneyCard from "../../core/food-journey/FoodJourneyCard";
 import { visitor_food_journey_view } from "@prisma/client";
 import { getFoodJourney } from "@/services/FoodJourneyService";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import LoginRequiredModal from "@/components/core/LoginRequiredModal";
 
 const FoodJourney = () => {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [journeys, setJourneys] = useState<visitor_food_journey_view[]>([]);
   const [hasMore, setHasMore] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const fetchStories = useCallback(async () => {
+    let userId: number | undefined = undefined;
+    if (session?.user?.id) {
+      userId = Number(session.user.id);
+    }
+    const data = await getFoodJourney(userId);
+    setHasMore(data.length > 6);
+    setJourneys(data); // Fetch only the first 6 journeys
+  }, [session]);
 
   useEffect(() => {
-    async function fetchJourneys() {
-      const data = await getFoodJourney();
-      setHasMore(data.length > 6);
-      setJourneys(data); // Fetch only the first 6 journeys
-    }
-    fetchJourneys();
-  }, []);
+    fetchStories();
+  }, [fetchStories]);
 
+  const handleEdit = (story: visitor_food_journey_view) => {
+    router.push(`/food-journey?edit=${story.VISITOR_FOOD_JOURNEY_ID}`);
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        document.getElementById('shareFoodJourneyStory')?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 300);
+  };
+
+  // Delete handler
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await fetch(`/api/food-journey/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete food journey');
+      fetchStories()
+    } catch (err) {
+      console.log(`Error deleting food journey : ${err}`)
+      alert('Failed to delete food journey');
+    }
+  };
+  
   return (
     <section className="w-full">
       <h2 className="sub-heading my-10 text-center">
@@ -32,7 +64,7 @@ const FoodJourney = () => {
       {/* Top Food Journey Stories */}
       <div className="px-4 lg:px-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 my-6">
         {journeys.slice(0, 6).map((j) => (
-          <FoodJourneyCard key={j.VISITOR_FOOD_JOURNEY_ID} journey={j} />
+          <FoodJourneyCard key={j.VISITOR_FOOD_JOURNEY_ID} journey={j} currentUserId={session?.user?.id} onDelete={handleDelete} onEdit={() => handleEdit(j)} />
         ))}
       </div>
       {/* CTA Button Below Banner */}
@@ -46,12 +78,23 @@ const FoodJourney = () => {
             </Link>
           )}
 
-          <Link href="/food-journey#shareFoodJourneyStory" passHref target="_blank">
-            <button className="btn-secondary">
-              Share Your Food Journey Experience
-            </button>
-          </Link>
+          <button
+            className="btn-secondary"
+            onClick={() => {
+              if (session) {
+                window.open('/food-journey#shareFoodJourneyStory', '_blank');
+              } else {
+                setShowLoginModal(true);
+              }
+            }}
+          >
+            Share Your Food Journey Experience
+          </button>
         </div>
+        <LoginRequiredModal
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+        />
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   business_detail_view_all,
   visitor_business_review_view,
@@ -36,20 +36,9 @@ export default function AllFoodeezReviewsPage() {
   const [editingReview, setEditingReview] = useState<visitor_business_review_view | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  // helper function 
-  async function fetchBusiness() {
-    try {
-      const data = await getBusinessById(Number(businessId));
-      setBusiness(data as business_detail_view_all);
 
-    } catch (error) {
-      console.error("Error fetching business:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
   // helper function 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     let userId: number | undefined = undefined;
     if (session?.user?.id) {
       userId = Number(session.user.id);
@@ -59,12 +48,22 @@ export default function AllFoodeezReviewsPage() {
       userId
     );
     setReviews(businessReviews);
-  };
+  }, [businessId, session]);
 
   useEffect(() => {
-    fetchBusiness()
+    async function fetchBusiness() {
+      try {
+        const data = await getBusinessById(Number(businessId));
+        setBusiness(data as business_detail_view_all);
+      } catch (error) {
+        console.error("Error fetching business:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBusiness();
     fetchReviews();
-  }, [businessId, session]);
+  }, [businessId, session, fetchReviews]);
 
   // Helper for address
   const getFullAddress = (b: business_detail_view_all | null | undefined) => {

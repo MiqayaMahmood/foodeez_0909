@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { business_detail_view_all, visitor_business_review_view } from "@prisma/client";
 import Link from "next/link";
@@ -11,7 +11,6 @@ import ReviewForm from "@/components/core/review/ReviewForm";
 import LoginRequiredModal from "@/components/core/LoginRequiredModal";
 import EditReviewModal from "@/components/core/review/EditReviewModal";
 import { getBusinessReviewsForUser } from "@/services/BusinessProfilePageService";
-import { extractBusinessId } from "@/lib/utils/genSlug";
 
 interface FoodeezReviewsProps {
   genSlug: string;
@@ -36,10 +35,8 @@ export default function FoodeezReviews({
   const [filteredReviews, setFilteredReviews] = useState<visitor_business_review_view[]>([]);
   const [displayedReviews, setDisplayedReviews] = useState<visitor_business_review_view[]>([]);
 
-  const parsedId = extractBusinessId(genSlug)
-
    // helper function 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     let userId: number | undefined = undefined;
     if (session?.user?.id) {
       userId = Number(session.user.id);
@@ -49,11 +46,11 @@ export default function FoodeezReviews({
       userId
     );
     setReviews(businessReviews);
-  };
+  }, [business.BUSINESS_ID, session]);
 
   useEffect(() => {
     fetchReviews();
-  }, [parsedId, session]);
+  }, [fetchReviews]);
 
 
   useEffect(() => {

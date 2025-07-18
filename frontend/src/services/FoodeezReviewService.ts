@@ -18,7 +18,6 @@ export class FoodeezReviewService {
     if (!response.ok) {
       throw new Error('Failed to fetch reviews');
     }
-    console.log(`Reviews Foodeez ${response}`)
     return response.json();
   }
 

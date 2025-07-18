@@ -53,6 +53,7 @@ const EditReviewModal: React.FC<EditReviewModalProps> = ({
             <div className="p-6">
               <ReviewForm
                 initialData={{
+                  name : review.REVIEWER_NAME || '',
                   rating: review.RATING || 5,
                   review: review.REVIEW || '',
                   images: [],

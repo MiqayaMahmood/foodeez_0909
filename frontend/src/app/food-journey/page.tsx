@@ -9,7 +9,6 @@ import FoodJourneyGrid from "@/components/core/food-journey/FoodJourneyGrid";
 import FoodJourneyPagination from "@/components/core/food-journey/FoodJourneyPagination";
 import FoodJourneyGridSkeleton from "@/components/core/food-journey/FoodJourneyGridSkeleton";
 import { visitor_food_journey_view } from "@prisma/client";
-import { useRouter, useSearchParams } from 'next/navigation';
 
 const initialForm = {
   TITLE: "",
@@ -44,12 +43,10 @@ async function uploadImagesToStrapi(images: File[]): Promise<string[]> {
   return uploadedUrls;
 }
 
-export default function FoodJourneyPage() {
+export default function FoodJourneyPage({ searchParams }: { searchParams: { [key: string]: string } })  {
 
   const { data: session } = useSession();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
+ 
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
@@ -77,11 +74,14 @@ export default function FoodJourneyPage() {
 
   useEffect(() => {
     // Check for ?edit=<id> in URL
-    const editId = searchParams.get('edit');
+    const editId = searchParams['edit'];
     if (editId) {
       (async () => {
         const data = await getFoodJourneyById(Number(editId));
         if (data) {
+          const previews = [data.PIC_1, data.PIC_2, data.PIC_3].filter((x): x is string => Boolean(x));
+          console.log('Edit from detail page, image URLs:', [data.PIC_1, data.PIC_2, data.PIC_3]);
+          console.log('Setting imagePreviews:', previews);
           setEditStory(data);
           setForm({
             TITLE: data.TITLE || '',
@@ -91,11 +91,7 @@ export default function FoodJourneyPage() {
             images: [],
           });
           setImages([]);
-          setImagePreviews([
-            data.PIC_1,
-            data.PIC_2,
-            data.PIC_3
-          ].filter((x): x is string => Boolean(x)));
+          setImagePreviews(previews);
           setError('');
           setSuccess('');
           setTimeout(() => {
@@ -139,6 +135,9 @@ export default function FoodJourneyPage() {
 
   // Edit handler
   const handleEdit = (story: visitor_food_journey_view) => {
+    const previews = [story.PIC_1, story.PIC_2, story.PIC_3].filter((x): x is string => Boolean(x));
+    console.log('Edit from card, image URLs:', [story.PIC_1, story.PIC_2, story.PIC_3]);
+    console.log('Setting imagePreviews:', previews);
     setEditStory(story);
     setForm({
       TITLE: story.TITLE || '',
@@ -148,11 +147,7 @@ export default function FoodJourneyPage() {
       images: [], // Images will be handled separately
     });
     setImages([]);
-    setImagePreviews([
-      story.PIC_1,
-      story.PIC_2,
-      story.PIC_3
-    ].filter((x): x is string => Boolean(x)));
+    setImagePreviews(previews);
     setError('');
     setSuccess('');
     // Scroll to form
@@ -179,7 +174,7 @@ export default function FoodJourneyPage() {
         imageUrls = await uploadImagesToStrapi(images);
       }
       // Prepare form data with image URLs, omitting 'images' field
-      const { images: _omit, ...formRest } = form;
+      const { ...formRest } = form;
       const formToSend = {
         ...formRest,
         PIC_1: imageUrls[0] || (editStory?.PIC_1 ?? undefined),
@@ -224,6 +219,7 @@ export default function FoodJourneyPage() {
       if (!res.ok) throw new Error('Failed to delete food journey');
       fetchStories();
     } catch (err) {
+      console.log(`Error deleting food journey : ${err}`)
       alert('Failed to delete food journey');
     }
   };
@@ -251,7 +247,7 @@ export default function FoodJourneyPage() {
           )}
         </>
       )}
-      <h2 className="sub-heading text-center mb-10" id="shareFoodJourneyStory">
+      <h2 className="main-heading text-center my-20" id="shareFoodJourneyStory">
         Share Your Food Journey
       </h2>
       <FoodJourneyForm

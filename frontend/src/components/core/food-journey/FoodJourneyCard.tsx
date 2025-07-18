@@ -80,7 +80,7 @@ const FoodJourneyCard: React.FC<FoodJourneyCardProps> = ({ journey, currentUserI
           </p>
         </div>
         {/* Owner Actions */}
-        {isOwner && (
+        {isOwner ? (
           <div className="flex">
             <button
               onClick={() => onEdit && onEdit(journey)}
@@ -97,11 +97,12 @@ const FoodJourneyCard: React.FC<FoodJourneyCardProps> = ({ journey, currentUserI
               <Trash className="w-4 h-4" />
             </button>
           </div>
-        )}
+        ) : null}
       </div>
       {/* Journey Title */}
       <Link
         href={`/food-journey/${slug}`}
+        target="_blank"
       >
         <h3 className="text-xl font-bold text-secondary mb-2 hover:underline focus:underline line-clamp-2"
           aria-label={`View food journey: ${journey.TITLE}`}

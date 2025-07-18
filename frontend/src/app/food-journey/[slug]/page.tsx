@@ -8,7 +8,7 @@ import { getFoodJourneyById } from '@/services/FoodJourneyService';
 import { parseSlug } from '@/lib/utils/genSlug';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import DeleteConfirmModal from '@/components/core/review/DeleteConfirmModal';
+import DeleteConfirmModal from '@/components/core/food-journey/DeleteConfirmModal';
 
 const FoodJourneyDetailPage = () => {
   const params = useParams();
@@ -58,6 +58,7 @@ const FoodJourneyDetailPage = () => {
       setShowDeleteModal(false);
       router.push('/food-journey');
     } catch (err) {
+      console.log(`Error deleting food journey : ${err}`)
       alert('Failed to delete food journey');
     } finally {
       setDeleting(false);
@@ -79,7 +80,7 @@ const FoodJourneyDetailPage = () => {
           {story.TITLE}
         </h1>
         {/* Owner Actions */}
-        {isOwner && (
+        {isOwner ? (
           <div className="flex justify-center gap-4 mb-6">
             <button
               onClick={handleEdit}
@@ -96,7 +97,7 @@ const FoodJourneyDetailPage = () => {
               Delete
             </button>
           </div>
-        )}
+        ) : null}
         <DeleteConfirmModal
           isOpen={showDeleteModal}
           onCancel={() => setShowDeleteModal(false)}
@@ -112,7 +113,7 @@ const FoodJourneyDetailPage = () => {
                 alt={`Food Journey Image ${idx + 1}`}
                 width={320}
                 height={220}
-                className="rounded-lg object-cover w-40 h-28 sm:w-60 sm:h-40 shadow-md hover:scale-105 transition"
+                className="rounded-lg object-contain bg-gray-100 w-40 h-28 sm:w-60 sm:h-40 shadow-md hover:scale-105 transition"
                 onClick={() => setPreviewImg(img)}
               />
             </div>

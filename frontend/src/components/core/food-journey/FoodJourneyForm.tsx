@@ -36,19 +36,10 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
   success,
   isEdit = false,
 }) => {
-  // Local state to manage previews (for edit mode)
-  const [localPreviews, setLocalPreviews] = React.useState<string[]>(imagePreviews);
-
-  React.useEffect(() => {
-    setLocalPreviews(imagePreviews);
-  }, [imagePreviews]);
-
   const handleRemovePreview = (idx: number) => {
-    setLocalPreviews((prev) => prev.filter((_, i) => i !== idx));
     onRemoveImage(idx);
   };
-
-  const canAddMore = localPreviews.length < 3;
+  const canAddMore = imagePreviews.length < 3;
 
   return (
     <div className="border border-primary  rounded-2xl p-4 lg:p-8 bg-primary/10">
@@ -119,10 +110,10 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
             <div className="flex gap-4">
               {[0, 1, 2].map((idx) => (
                 <div key={idx} className="relative group w-24 h-36 bg-gray-100 rounded-xl flex items-center justify-center shadow-md overflow-hidden">
-                  {localPreviews[idx] ? (
+                  {imagePreviews[idx] ? (
                     <>
                       <Image
-                        src={localPreviews[idx]}
+                        src={imagePreviews[idx]}
                         alt={`Preview ${idx + 1}`}
                         className="object-cover w-full h-full rounded-xl"
                         width={200}
@@ -148,7 +139,7 @@ const FoodJourneyForm: React.FC<FoodJourneyFormProps> = ({
                         accept="image/*"
                         onChange={onImageChange}
                         className="hidden"
-                        disabled={localPreviews.length >= 3}
+                        disabled={imagePreviews.length >= 3}
                       />
                     </label>
                   ) : null}
