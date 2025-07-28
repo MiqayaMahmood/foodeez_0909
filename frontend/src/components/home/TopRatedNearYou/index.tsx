@@ -34,6 +34,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [initialLocationCheck, setInitialLocationCheck] = useState(true);
     const [shouldRender, setShouldRender] = useState(true);
+    const [hasTriedFetch, setHasTriedFetch] = useState(false);
 
     // Get user location
     const getUserLocation = (): Promise<{ lat: number; lng: number }> => {
@@ -43,14 +44,14 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
                 return;
             }
 
-                  navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          resolve({ lat: latitude, lng: longitude });
-        },
-        () => {
-          reject(new Error("Unable to retrieve your location."));
-        },
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    resolve({ lat: latitude, lng: longitude });
+                },
+                () => {
+                    reject(new Error("Unable to retrieve your location."));
+                },
                 {
                     enableHighAccuracy: true,
                     timeout: 10000,
@@ -60,44 +61,57 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
         });
     };
 
-      // Try to get restaurants with user location first, then fallback to IP
-  const tryGetRestaurants = useCallback(async (useUserLocation: boolean = true) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      let nearbyRestaurants: BusinessDetail[] = [];
-      
-      if (useUserLocation && userLocation) {
-        // Try with user's GPS location (1km radius)
-        nearbyRestaurants = await getTopRatedRestaurantsNearYou(userLocation.lat, userLocation.lng, 4);
-      }
-      
-      // If no restaurants found with GPS location, try IP-based location
-      if (nearbyRestaurants.length === 0) {
-        nearbyRestaurants = await getTopRatedRestaurantsByIPLocation(4);
-      }
-      
-      // If still no restaurants found, hide the component
-      if (nearbyRestaurants.length === 0) {
-        setShouldRender(false);
-        return;
-      }
-      
-      setRestaurants(nearbyRestaurants);
-    } catch (err) {
-      console.error("Error fetching restaurants:", err);
-      setError("Failed to fetch restaurants. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, [userLocation]);
+    // Try to get restaurants with user location first, then fallback to IP
+    const tryGetRestaurants = useCallback(async (useUserLocation: boolean = true) => {
+        // Prevent multiple simultaneous requests
+        if (hasTriedFetch) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+            setHasTriedFetch(true);
+
+            let nearbyRestaurants: BusinessDetail[] = [];
+
+            if (useUserLocation && userLocation) {
+                // Try with user's GPS location (1km radius)
+                nearbyRestaurants = await getTopRatedRestaurantsNearYou(userLocation.lat, userLocation.lng, 4);
+            }
+
+            // If no restaurants found with GPS location, try IP-based location (Zurich default)
+            if (nearbyRestaurants.length === 0) {
+                try {
+                    nearbyRestaurants = await getTopRatedRestaurantsByIPLocation(4);
+                } catch (ipError) {
+                    console.warn("IP-based location failed:", ipError);
+                    // Continue without IP location - component will be hidden if no results
+                }
+            }
+
+            // If still no restaurants found, hide the component
+            if (nearbyRestaurants.length === 0) {
+                setShouldRender(false);
+                return;
+            }
+            
+            setRestaurants(nearbyRestaurants);
+        } catch (err) {
+            console.error("Error fetching restaurants:", err);
+            setError("Failed to fetch restaurants. Please try again.");
+            // Don't hide component on error, let user retry
+        } finally {
+            setLoading(false);
+        }
+    }, [userLocation, hasTriedFetch]);
 
     // Enable location and fetch restaurants
     const enableLocationAndFetch = async () => {
         try {
             setLoading(true);
             setError(null);
+            setHasTriedFetch(false); // Reset to allow retry
 
             const location = await getUserLocation();
             setUserLocation(location);
@@ -156,7 +170,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
     if (initialLocationCheck) {
         return (
             <section className={`py-16 px-4 lg:px-0 ${className}`}>
-                <div className="max-w-7xl mx-auto">
+                <div className="">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
                             Top Rated Restaurants Near You
@@ -181,7 +195,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
     if (!locationEnabled && !loading && restaurants.length === 0) {
         return (
             <section className={`py-16 px-4 lg:px-0 ${className}`}>
-                <div className="max-w-7xl mx-auto">
+                <div className="">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
                             Top Rated Restaurants Near You
@@ -210,7 +224,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
         return (
             <>
                 <section className={`py-16 px-4 lg:px-0 ${className}`}>
-                    <div className="max-w-7xl mx-auto">
+                    <div className="">
                         <div className="text-center mb-12">
                             <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
                                 Top Rated Restaurants Near You
@@ -237,7 +251,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
     if (error && restaurants.length === 0) {
         return (
             <section className={`py-16 px-4 lg:px-0 ${className}`}>
-                <div className="max-w-7xl mx-auto">
+                <div className="">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
                             Top Rated Restaurants Near You
@@ -246,7 +260,11 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
                             {error}
                         </p>
                         <Button
-                            onClick={enableLocationAndFetch}
+                            onClick={() => {
+                                setHasTriedFetch(false);
+                                setError(null);
+                                enableLocationAndFetch();
+                            }}
                             className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-full"
                         >
                             Try Again
@@ -260,7 +278,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
     return (
         <>
             <section className={`py-16 px-4 lg:px-0 ${className}`}>
-                <div className="max-w-7xl mx-auto">
+                <div className="">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
                             Top Rated Restaurants Near You

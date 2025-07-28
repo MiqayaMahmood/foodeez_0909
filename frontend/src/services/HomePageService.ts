@@ -227,6 +227,7 @@ export async function getFoodeezReview() {
   }
 }
 
+
 /**
  * Get top rated restaurants within 1km of the user's GPS location
  * @param latitude - User's latitude
@@ -234,7 +235,7 @@ export async function getFoodeezReview() {
  * @param limit - Number of restaurants to return (default: 4)
  * @returns Array of top rated restaurants sorted by rating and distance
  */
-export async function getTopRatedRestaurantsNearYou(latitude: number, longitude: number, limit: number = 4): Promise<BusinessDetail[]> {
+export async function getTopRatedRestaurantsNearYou(latitude: number, longitude: number, limit: number = 4 , radius: number = 1): Promise<BusinessDetail[]> {
   try {
     // Using raw query to calculate distance and get top rated restaurants within 1km
     const restaurants = await prisma.$queryRaw<BusinessDetail[]>`
@@ -243,7 +244,7 @@ export async function getTopRatedRestaurantsNearYou(latitude: number, longitude:
         Round((calculate_distance_km(${latitude}, ${longitude}, b.latitude, b.longitude))*1000, 2) AS distance_M, 
         calculate_distance_km(${latitude}, ${longitude}, b.latitude, b.longitude) AS distance_km
       FROM business_detail_view_all b
-      WHERE calculate_distance_km(${latitude}, ${longitude}, b.latitude, b.longitude) <= 1
+      WHERE calculate_distance_km(${latitude}, ${longitude}, b.latitude, b.longitude) <= ${radius}
         AND b.APPROVED = 1
         AND b.STATUS = 1
         AND b.GOOGLE_RATING IS NOT NULL
@@ -260,31 +261,122 @@ export async function getTopRatedRestaurantsNearYou(latitude: number, longitude:
   }
 }
 
+// /**
+//  * Get user's location from IP address - simplified to use default Zurich location
+//  * @returns Location object with Zurich coordinates as default
+//  */
+// export async function getUserLocationFromIP() {
+//   try {
+//     // Use default Zurich location instead of unreliable IP geolocation services
+//     console.log('Using default Zurich location for IP-based search');
+//     return {
+//       lat: 47.3769,
+//       lng: 8.5417,
+//       city: 'Zurich',
+//       country: 'Switzerland'
+//     };
+//   } catch (error) {
+//     console.error('Error in getUserLocationFromIP:', error);
+//     // Return default location as fallback
+//     return {
+//       lat: 47.3769,
+//       lng: 8.5417,
+//       city: 'Zurich',
+//       country: 'Switzerland'
+//     };
+//   }
+// }
+
 /**
- * Get user's location from IP address using ipapi.co service
- * @returns Location object with lat, lng, city, and country, or null if failed
+ * Get user's location from IP address using multiple fallback services
+ * @returns Location object with lat, lng, city, and country, or null if all services fail
  */
 export async function getUserLocationFromIP() {
-  try {
-    // Using a free IP geolocation service
-    const response = await fetch('https://ipapi.co/json/');
-    const data = await response.json();
-    
-    if (data.latitude && data.longitude) {
-      return {
-        lat: parseFloat(data.latitude),
-        lng: parseFloat(data.longitude),
-        city: data.city,
-        country: data.country_name
-      };
+  const services = [
+    {
+      url: 'https://ipapi.co/json/',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    },
+    {
+      url: 'https://ipinfo.io/json',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    },
+    {
+      url: 'https://api.myip.com',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
     }
-    
-    throw new Error('Could not determine location from IP');
-  } catch (error) {
-    console.error('Error getting location from IP:', error);
-    return null;
+  ];
+
+  for (const service of services) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
+
+      const response = await fetch(service.url, {
+        method: 'GET',
+        headers: service.headers,
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        console.warn(`Service ${service.url} responded with status: ${response.status}`);
+        continue;
+      }
+
+      const data = await response.json();
+
+      let lat, lng, city, country;
+
+      if (service.url.includes('ipapi.co')) {
+        lat = data.latitude;
+        lng = data.longitude;
+        city = data.city;
+        country = data.country_name;
+      } else if (service.url.includes('ipinfo.io')) {
+        const [latStr, lngStr] = data.loc?.split(',') || [];
+        lat = parseFloat(latStr);
+        lng = parseFloat(lngStr);
+        city = data.city;
+        country = data.country;
+      } else if (service.url.includes('myip.com')) {
+        lat = data.lat;
+        lng = data.lon;
+        city = data.city;
+        country = data.country;
+      }
+
+      if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+        // console.log(`Location from ${service.url}:`, { lat, lng, city, country });
+        return {
+          lat,
+          lng,
+          city: city || 'Unknown',
+          country: country || 'Unknown'
+        };
+      }
+
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn(`Error with ${service.url}:`, message);
+    }
   }
+
+  // All services failed
+  console.warn('All geolocation services failed. Returning null.');
+  return null;
 }
+
 
 /**
  * Get top rated restaurants using IP-based location as fallback
