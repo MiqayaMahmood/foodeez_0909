@@ -46,6 +46,8 @@ model business {
   IMAGE_URL          String?            @db.VarChar(1000)
   GOOGLE_RATING      String?            @db.VarChar(10)
   WHATSAPP_LINK      String?            @db.VarChar(255)
+  LATITUDE           Float?             @default(0)
+  LONGITUDE          Float?             @default(0)
   APPROVED           Int?               @default(0) @db.TinyInt
   STATUS             Int?               @default(0) @db.TinyInt
   business_product   business_product[]
@@ -514,6 +516,8 @@ view business_detail_view_all {
   GOOGLE_PROFILE          String? @db.VarChar(1000)
   IMAGE_URL               String? @db.VarChar(1000)
   GOOGLE_RATING           String? @db.VarChar(10)
+  LATITUDE                Float?  @default(0)
+  LONGITUDE               Float?  @default(0)
   APPROVED                Int?    @default(0) @db.TinyInt
   STATUS                  Int?    @default(0) @db.TinyInt
   RANKING                 BigInt  @default(0)
@@ -547,6 +551,8 @@ view business_detail_view_halal {
   GOOGLE_PROFILE          String? @db.VarChar(1000)
   IMAGE_URL               String? @db.VarChar(1000)
   GOOGLE_RATING           String? @db.VarChar(10)
+  LATITUDE                Float?  @default(0)
+  LONGITUDE               Float?  @default(0)
   APPROVED                Int?    @default(0) @db.TinyInt
   STATUS                  Int?    @default(0) @db.TinyInt
   RANKING                 BigInt  @default(0)
@@ -580,6 +586,8 @@ view business_detail_view_vegan {
   GOOGLE_PROFILE          String? @db.VarChar(1000)
   IMAGE_URL               String? @db.VarChar(1000)
   GOOGLE_RATING           String? @db.VarChar(10)
+  LATITUDE                Float?  @default(0)
+  LONGITUDE               Float?  @default(0)
   APPROVED                Int?    @default(0) @db.TinyInt
   STATUS                  Int?    @default(0) @db.TinyInt
   RANKING                 BigInt  @default(0)
@@ -613,6 +621,8 @@ view business_detail_view_vegetarian {
   GOOGLE_PROFILE          String? @db.VarChar(1000)
   IMAGE_URL               String? @db.VarChar(1000)
   GOOGLE_RATING           String? @db.VarChar(10)
+  LATITUDE                Float?  @default(0)
+  LONGITUDE               Float?  @default(0)
   APPROVED                Int?    @default(0) @db.TinyInt
   STATUS                  Int?    @default(0) @db.TinyInt
   RANKING                 BigInt  @default(0)

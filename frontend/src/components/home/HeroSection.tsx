@@ -55,7 +55,7 @@ const HeroSection = () => {
                   src={banner.src}
                   alt={banner.alt}
                   fill
-                  className="object-cover"
+                  className="object-contain lg:object-cover"
                   priority
                 />
               </div>

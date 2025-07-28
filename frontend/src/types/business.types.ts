@@ -25,6 +25,8 @@ export interface BusinessDetail {
   GOOGLE_PROFILE?: string;
   IMAGE_URL?: string;
   GOOGLE_RATING?: string;
+  LATITUDE?: number;
+  LONGITUDE?: number;
   APPROVED?: number;
   STATUS?: number;
   RANKING?: bigint;
@@ -66,6 +68,8 @@ export type BusinessResult = Prisma.business_detail_view_allGetPayload<{
     GOOGLE_PROFILE: true;
     IMAGE_URL: true;
     GOOGLE_RATING: true;
+    LATITUDE: true;
+    LONGITUDE: true;
     APPROVED: true;
     STATUS: true;
     RANKING: true;
@@ -75,4 +79,4 @@ export type BusinessResult = Prisma.business_detail_view_allGetPayload<{
     CAN_RESERVE_TABLE: true;
     HAVING_ACTIVE_MENU_CARD: true;
   }
-}>[];
+}>[] | BusinessDetail[];

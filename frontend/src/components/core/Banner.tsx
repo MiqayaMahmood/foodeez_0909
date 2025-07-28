@@ -15,7 +15,7 @@ const Banner: React.FC<BannerComponentProps> = ({ src, alt }) => {
         alt={alt}
         width={1440}
         height={560}
-        className="w-full h-[560px] object-cover"
+        className="w-full h-[560px] object-contain md:object-cover"
         priority
       />
     </div>

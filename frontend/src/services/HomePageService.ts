@@ -59,41 +59,9 @@ export async function getBusinessesByLocation({
       where: whereClause, // Use the determined where clause
       take: Math.min(limit, 50), // enforce upper bound
       orderBy: { BUSINESS_NAME: 'asc' },
-      select: {
-        BUSINESS_ID: true,
-        BUSINESS_NAME: true,
-        SHORT_NAME: true,
-        DESCRIPTION: true,
-        ADDRESS_STREET: true,
-        ADDRESS_ZIP: true,
-        ADDRESS_TOWN: true,
-        ADDRESS_CITY_ID: true,
-        CITY_CODE: true,
-        CITY_NAME: true,
-        EMAIL_ADDRESS: true,
-        ADDRESS_COUNTRY: true,
-        PHONE_NUMBER: true,
-        WHATSAPP_NUMBER: true,
-        WEB_ADDRESS: true,
-        LOGO: true,
-        FACEBOOK_LINK: true,
-        INSTA_LINK: true,
-        TIKTOK_LINK: true,
-        GOOGLE_PROFILE: true,
-        IMAGE_URL: true,
-        GOOGLE_RATING: true,
-        APPROVED: true,
-        STATUS: true,
-        RANKING: true,
-        VEGAN: true,
-        VEGETARIAN: true,
-        HALAL: true,
-        CAN_RESERVE_TABLE: true,
-        HAVING_ACTIVE_MENU_CARD: true
-      }
     });
 
-    return result;
+    return result as BusinessDetail[];
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       console.error('[Prisma Error]', error.code, error.message);
@@ -255,6 +223,103 @@ export async function getFoodeezReview() {
     return reviews;
   } catch (error) {
     console.error('Error fetching Foodeez reviews:', error);
+    return [];
+  }
+}
+
+/**
+ * Get top rated restaurants within 1km of the user's GPS location
+ * @param latitude - User's latitude
+ * @param longitude - User's longitude  
+ * @param limit - Number of restaurants to return (default: 4)
+ * @returns Array of top rated restaurants sorted by rating and distance
+ */
+export async function getTopRatedRestaurantsNearYou(latitude: number, longitude: number, limit: number = 4): Promise<BusinessDetail[]> {
+  try {
+    // Using raw query to calculate distance and get top rated restaurants within 1km
+    const restaurants = await prisma.$queryRaw<BusinessDetail[]>`
+      SELECT 
+        b.*, 
+        Round((calculate_distance_km(${latitude}, ${longitude}, b.latitude, b.longitude))*1000, 2) AS distance_M, 
+        calculate_distance_km(${latitude}, ${longitude}, b.latitude, b.longitude) AS distance_km
+      FROM business_detail_view_all b
+      WHERE calculate_distance_km(${latitude}, ${longitude}, b.latitude, b.longitude) <= 1
+        AND b.APPROVED = 1
+        AND b.STATUS = 1
+        AND b.GOOGLE_RATING IS NOT NULL
+        AND b.GOOGLE_RATING != ''
+        AND b.GOOGLE_RATING != '0'
+      ORDER BY CAST(b.GOOGLE_RATING AS DECIMAL(3,1)) DESC, distance_M ASC
+      LIMIT ${limit}
+    `;
+
+    return restaurants;
+  } catch (error) {
+    console.error('Error fetching top rated restaurants near you:', error);
+    return [];
+  }
+}
+
+/**
+ * Get user's location from IP address using ipapi.co service
+ * @returns Location object with lat, lng, city, and country, or null if failed
+ */
+export async function getUserLocationFromIP() {
+  try {
+    // Using a free IP geolocation service
+    const response = await fetch('https://ipapi.co/json/');
+    const data = await response.json();
+    
+    if (data.latitude && data.longitude) {
+      return {
+        lat: parseFloat(data.latitude),
+        lng: parseFloat(data.longitude),
+        city: data.city,
+        country: data.country_name
+      };
+    }
+    
+    throw new Error('Could not determine location from IP');
+  } catch (error) {
+    console.error('Error getting location from IP:', error);
+    return null;
+  }
+}
+
+/**
+ * Get top rated restaurants using IP-based location as fallback
+ * Uses 5km radius since IP location is less accurate than GPS
+ * @param limit - Number of restaurants to return (default: 4)
+ * @returns Array of top rated restaurants sorted by rating and distance
+ */
+export async function getTopRatedRestaurantsByIPLocation(limit: number = 4 , radius: number = 5): Promise<BusinessDetail[]> {
+  try {
+    const ipLocation = await getUserLocationFromIP();
+    
+    if (!ipLocation) {
+      return [];
+    }
+
+    // Use IP location to get restaurants within 5km (wider radius for IP-based location)
+    const restaurants = await prisma.$queryRaw<BusinessDetail[]>`
+      SELECT 
+        b.*, 
+        Round((calculate_distance_km(${ipLocation.lat}, ${ipLocation.lng}, b.latitude, b.longitude))*1000, 2) AS distance_M, 
+        calculate_distance_km(${ipLocation.lat}, ${ipLocation.lng}, b.latitude, b.longitude) AS distance_km
+      FROM business_detail_view_all b
+      WHERE calculate_distance_km(${ipLocation.lat}, ${ipLocation.lng}, b.latitude, b.longitude) <= ${radius}
+        AND b.APPROVED = 1
+        AND b.STATUS = 1
+        AND b.GOOGLE_RATING IS NOT NULL
+        AND b.GOOGLE_RATING != ''
+        AND b.GOOGLE_RATING != '0'
+      ORDER BY CAST(b.GOOGLE_RATING AS DECIMAL(3,1)) DESC, distance_M ASC
+      LIMIT ${limit}
+    `;
+
+    return restaurants;
+  } catch (error) {
+    console.error('Error fetching top rated restaurants by IP location:', error);
     return [];
   }
 }

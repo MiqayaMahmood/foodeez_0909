@@ -5,6 +5,7 @@ import BusinessCTA from "@/components/home/CTAs/BusinessCTA";
 import FaqSection from "@/components/home/FaqSection";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturedBusiness from "@/components/home/FeaturedBusiness";
+import TopRatedNearYou from "@/components/home/TopRatedNearYou";
 // import QuickSearch from "@/components/home/QuickSearch";
 // import ScrollingBusinessBar from "@/components/home/ScrollingBusinessBar";
 import MapSection from "@/components/home/MapSection";
@@ -29,9 +30,12 @@ export default function Home() {
 
       <AdsBar2 />
       <Separator />
-      {/* Scrolling Business Bar */}
 
+      {/* Scrolling Business Bar */}
       {/* <ScrollingBusinessBar /> */}
+
+      {/* Top Rated Restaurants Near You */}
+      <TopRatedNearYou />
 
       {/* Featured Business Grid */}
       <FeaturedBusiness />
