@@ -2,22 +2,38 @@
 
 import Image from 'next/image';
 
-interface BannerComponentProps {
-  src: string;
+interface BannerProps {
+  desktopSrc: string;
+  mobileSrc: string;
   alt: string;
 }
 
-const Banner: React.FC<BannerComponentProps> = ({ src, alt }) => {
+const Banner: React.FC<BannerProps> = ({ desktopSrc, mobileSrc, alt }) => {
   return (
-    <div className="px-0 w-full">
-      <Image
-        src={src}
-        alt={alt}
-        width={1440}
-        height={560}
-        className="w-full h-[560px] object-contain md:object-cover"
-        priority
-      />
+    <div className="w-full relative">
+      {/* Mobile Banner */}
+      <div className="block md:hidden">
+        <Image
+          src={mobileSrc}
+          alt={alt}
+          width={720}
+          height={400}
+          className="w-full h-[560px] object-contain"
+          priority
+        />
+      </div>
+
+      {/* Desktop Banner */}
+      <div className="hidden md:block">
+        <Image
+          src={desktopSrc}
+          alt={alt}
+          width={1440}
+          height={560}
+          className="w-full h-[560px] object-contain"
+          priority
+        />
+      </div>
     </div>
   );
 };

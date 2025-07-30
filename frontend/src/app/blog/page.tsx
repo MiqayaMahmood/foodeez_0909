@@ -45,10 +45,14 @@ export default function BlogPage() {
 
   return (
     <div className="">
-        <Banner src="/images/banners/banner1.jpeg" alt={`Banner`} />
+      <Banner
+        desktopSrc="/images/banners/banner1.jpeg"
+        mobileSrc="/images/bannerForMobile/banner1.jpeg"
+        alt={`Banner`}
+      />
       <div className="text-center my-12">
-      <h1 className="main-heading">Foodeez Blogs</h1>
-      <p className="main-heading-description">Here you can read many blogs of Foodeez</p>
+        <h1 className="main-heading">Foodeez Blogs</h1>
+        <p className="main-heading-description">Here you can read many blogs of Foodeez</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ">
         {blogs.map((blog) => (

@@ -74,7 +74,8 @@ export default function ContactPage() {
     <div className="">
       {/* Header */}
       <Banner
-        src="/images/banners/banner1.jpeg"
+        desktopSrc="/images/banners/banner1.jpeg"
+        mobileSrc="/images/bannerForMobile/banner1.jpeg"
         alt="Register Your Business on Foodeez"
       />
       <div className="my-16">

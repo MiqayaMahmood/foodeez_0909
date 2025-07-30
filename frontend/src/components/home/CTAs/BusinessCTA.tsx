@@ -4,9 +4,9 @@ import React from "react";
 
 const ShareExperience = () => {
   return (
-    <section className="w-full text-center py-10 px-4 lg:px-0">
+    <section className="w-full text-center py-10">
       {/* Heading Section */}
-      <div className=" mb-12 space-y-6">
+      <div className="px-4 lg:px-0 mb-12 space-y-6">
         <h2 className="text-xl sm:text-2xl text-text-muted font-medium">
           Are you a Restaurant Owner, Takeaway Service, Caterer, Event
           Organizer, or Party Hall Manager?
@@ -16,16 +16,16 @@ const ShareExperience = () => {
         </h3>
       </div>
 
-      {/* Banner Image */}
-      <div className="w-full overflow-hidden rounded-2xl shadow-lg">
+
         <Banner
-          src="/images/banners/CTAs/registerCTA.png"
+          desktopSrc="/images/banners/register.png"
+          mobileSrc="/images/bannerForMobile/register.png"
           alt="Register your business"
         />
-      </div>
+     
 
       {/* Description Text */}
-      <div className="max-w-5xl mx-auto mt-12 mb-16">
+      <div className=" px-4 lg:px-0 max-w-5xl mx-auto mt-12 mb-16">
         <p className="text-lg sm:text-xl lg:text-2xl text-text-muted leading-relaxed">
           Join Switzerland's fast-growing food and event discovery platform –
           <span className="font-semibold text-primary-dark">

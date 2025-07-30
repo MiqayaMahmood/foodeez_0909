@@ -7,18 +7,18 @@
  * 
  * Features:
  * - Automatically detects if user has location enabled
- * - Falls back to IP-based location if GPS location is not available
+ * - Falls back to default location if GPS access is denied
  * - Removes the component entirely if no restaurants are found
- * - Uses 1km radius for GPS location, 5km radius for IP location
+ * - Uses 1km radius for GPS location
  * - Shows loading states and error handling
  * - Reuses existing BusinessCard component
  */
 
 import { useState, useEffect, useCallback } from "react";
 import { BusinessDetail } from "@/types/business.types";
-import { getTopRatedRestaurantsNearYou, getTopRatedRestaurantsByIPLocation } from "@/services/HomePageService";
+import { getTopRatedRestaurantsNearYou } from "@/services/HomePageService";
 import BusinessCard from "@/components/core/BusinessCard";
-import { MapPin, Star } from "lucide-react";
+import { MapPin } from "lucide-react";
 import Button from "@/components/core/Button";
 import Separator from "@/components/ui/separator";
 
@@ -31,10 +31,9 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [locationEnabled, setLocationEnabled] = useState(false);
-    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number }>({ lat: 0, lng: 0 });
     const [initialLocationCheck, setInitialLocationCheck] = useState(true);
     const [shouldRender, setShouldRender] = useState(true);
-    const [hasTriedFetch, setHasTriedFetch] = useState(false);
 
     // Get user location
     const getUserLocation = (): Promise<{ lat: number; lng: number }> => {
@@ -61,69 +60,46 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
         });
     };
 
-    // Try to get restaurants with user location first, then fallback to IP
-    const tryGetRestaurants = useCallback(async (useUserLocation: boolean = true) => {
-        // Prevent multiple simultaneous requests
-        if (hasTriedFetch) {
-            return;
-        }
-
+    // Fetch restaurants with location
+    const fetchRestaurants = useCallback(async (location: { lat: number; lng: number } = userLocation) => {
         try {
             setLoading(true);
             setError(null);
-            setHasTriedFetch(true);
 
-            let nearbyRestaurants: BusinessDetail[] = [];
+            const nearbyRestaurants = await getTopRatedRestaurantsNearYou(location.lat, location.lng, 4);
 
-            if (useUserLocation && userLocation) {
-                // Try with user's GPS location (1km radius)
-                nearbyRestaurants = await getTopRatedRestaurantsNearYou(userLocation.lat, userLocation.lng, 4);
-            }
-
-            // If no restaurants found with GPS location, try IP-based location (Zurich default)
-            if (nearbyRestaurants.length === 0) {
-                try {
-                    nearbyRestaurants = await getTopRatedRestaurantsByIPLocation(4);
-                } catch (ipError) {
-                    console.warn("IP-based location failed:", ipError);
-                    // Continue without IP location - component will be hidden if no results
-                }
-            }
-
-            // If still no restaurants found, hide the component
+            // If no restaurants found, hide the component
             if (nearbyRestaurants.length === 0) {
                 setShouldRender(false);
                 return;
             }
-            
+
             setRestaurants(nearbyRestaurants);
         } catch (err) {
             console.error("Error fetching restaurants:", err);
             setError("Failed to fetch restaurants. Please try again.");
-            // Don't hide component on error, let user retry
         } finally {
             setLoading(false);
         }
-    }, [userLocation, hasTriedFetch]);
+    }, [userLocation]);
 
     // Enable location and fetch restaurants
     const enableLocationAndFetch = async () => {
         try {
             setLoading(true);
             setError(null);
-            setHasTriedFetch(false); // Reset to allow retry
 
             const location = await getUserLocation();
             setUserLocation(location);
             setLocationEnabled(true);
 
-            await tryGetRestaurants(true);
+            await fetchRestaurants(userLocation);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to get location");
             setLocationEnabled(false);
 
-            // If user location fails, try IP-based location
-            await tryGetRestaurants(false);
+            // If user location fails, try with default coordinates
+            await fetchRestaurants(userLocation);
         } finally {
             setLoading(false);
         }
@@ -135,18 +111,19 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-                    setUserLocation({ lat: latitude, lng: longitude });
+                    const location = { lat: latitude, lng: longitude };
+                    setUserLocation(location);
                     setLocationEnabled(true);
                     setInitialLocationCheck(false);
 
                     // Auto-fetch restaurants if location is already available
-                    tryGetRestaurants(true);
+                    fetchRestaurants(userLocation);
                 },
                 () => {
-                    // Location not available, try IP-based location
+                    // Location not available, try with default coordinates
                     setLocationEnabled(false);
                     setInitialLocationCheck(false);
-                    tryGetRestaurants(false);
+                    fetchRestaurants(userLocation);
                 },
                 {
                     enableHighAccuracy: true,
@@ -157,10 +134,10 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
         } else {
             setError("Geolocation is not supported by this browser.");
             setInitialLocationCheck(false);
-            // Try IP-based location as fallback
-            tryGetRestaurants(false);
+            // Try with default coordinates as fallback
+            fetchRestaurants(userLocation);
         }
-    }, [tryGetRestaurants]);
+    }, [fetchRestaurants, userLocation]);
 
     // Don't render the component if no restaurants found
     if (!shouldRender) {
@@ -172,7 +149,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
             <section className={`py-16 px-4 lg:px-0 ${className}`}>
                 <div className="">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
+                        <h2 className="sub-heading">
                             Top Rated Restaurants Near You
                         </h2>
                         <p className="text-lg text-text-muted">
@@ -197,7 +174,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
             <section className={`py-16 px-4 lg:px-0 ${className}`}>
                 <div className="">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
+                        <h2 className="sub-heading">
                             Top Rated Restaurants Near You
                         </h2>
                         <p className="text-lg text-text-muted max-w-2xl mx-auto">
@@ -226,7 +203,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
                 <section className={`py-16 px-4 lg:px-0 ${className}`}>
                     <div className="">
                         <div className="text-center mb-12">
-                            <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
+                            <h2 className="sub-heading">
                                 Top Rated Restaurants Near You
                             </h2>
                             <p className="text-lg text-text-muted">
@@ -253,7 +230,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
             <section className={`py-16 px-4 lg:px-0 ${className}`}>
                 <div className="">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
+                        <h2 className="sub-heading">
                             Top Rated Restaurants Near You
                         </h2>
                         <p className="text-lg text-text-muted mb-6">
@@ -261,7 +238,6 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
                         </p>
                         <Button
                             onClick={() => {
-                                setHasTriedFetch(false);
                                 setError(null);
                                 enableLocationAndFetch();
                             }}
@@ -277,26 +253,22 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
 
     return (
         <>
-            <section className={`py-16 px-4 lg:px-0 ${className}`}>
+            <section className={`py-0 lg:py-16 px-4 lg:px-0 ${className}`}>
                 <div className="">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
+                        <h2 className="sub-heading">
                             Top Rated Restaurants Near You
                         </h2>
-                        <p className="text-lg text-text-muted max-w-2xl mx-auto">
+                        <p className="sub-heading-description">
                             Discover the highest-rated restaurants within 1km of your current location
                         </p>
-                        <div className="flex items-center justify-center gap-2 mt-4 text-sm text-text-muted">
-                            <MapPin size={16} />
-                            <span>Within 1km radius</span>
-                            <Star size={16} className="text-highlight" />
-                            <span>Sorted by rating</span>
-                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {restaurants.map((restaurant) => (
-                            <BusinessCard key={restaurant.BUSINESS_ID} business={restaurant} />
+                            <div key={restaurant.BUSINESS_ID} className="">
+                                <BusinessCard business={restaurant} />
+                            </div>
                         ))}
                     </div>
                 </div>

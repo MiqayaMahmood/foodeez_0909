@@ -26,10 +26,10 @@
   }
 
   .sub-heading {
-    @apply text-xl md:text-2xl lg:text-4xl text-primary font-bold mb-4
+    @apply text-2xl lg:text-4xl text-primary font-bold mb-4
   }
   .sub-heading-description {
-    @apply text-secondary text-base md:text-lg lg:text-xl max-w-2xl mx-auto
+    @apply text-text-muted text-base md:text-lg lg:text-xl max-w-2xl mx-auto
   }
   
   .btn-primary {

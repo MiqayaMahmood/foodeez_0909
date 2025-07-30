@@ -98,7 +98,7 @@ const TestimonialsSection: React.FC = () => {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center gap-2 mb-4 sub-heading">
-            <Award className="w-8 h-8 lg:w-12 lg:h-12 text-secondary" />
+            <Award className="hidden lg:block w-8 h-8 lg:w-12 lg:h-12 text-secondary" />
             <h2 className="">Discover what food lovers think about foodeez</h2>
           </div>
           <p className="sub-heading-description">

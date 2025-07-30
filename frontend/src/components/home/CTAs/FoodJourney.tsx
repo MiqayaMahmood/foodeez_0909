@@ -57,7 +57,8 @@ const FoodJourney = () => {
       </h2>
 
       <Banner
-        src="/images/banners/CTAs/shareExperiance.png"
+        desktopSrc="/images/banners/foodJourney.png"
+        mobileSrc="/images/bannerForMobile/foodJourney.png"
         alt="Share Your Experience"
       />
 

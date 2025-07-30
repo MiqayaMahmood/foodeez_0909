@@ -155,7 +155,11 @@ export default function ReservationPage() {
         <link rel="canonical" href={url} />
       </head>
       <div className="">
-        <Banner src="/images/banners/banner1.jpeg" alt={`Banner`} />
+        <Banner
+          desktopSrc="/images/banners/banner1.jpeg"
+          mobileSrc="/images/bannerForMobile/banner1.jpeg"
+          alt={`Banner`}
+        />
         <div className="">
           <ReservationHero business={business} />
           <div className="grid grid-cols-1 md:grid-cols-2 md:gap-8 mb-10">

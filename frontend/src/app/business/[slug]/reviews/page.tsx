@@ -102,7 +102,8 @@ export default function AllFoodeezReviewsPage() {
   return (
     <div className="">
       <Banner
-        src="/images/banners/CTAs/shareExperiance.png"
+        desktopSrc="/images/banners/banner1.jpeg"
+        mobileSrc="/images/bannerForMobile/banner1.jpeg"
         alt="Share Your Experience with Foodeez"
       />
       <div className="px-2 sm:px-4 lg:px-0">
