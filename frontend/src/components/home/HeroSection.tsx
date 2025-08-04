@@ -63,7 +63,7 @@ const HeroSection = () => {
                     src={banner.src}
                     alt={banner.alt}
                     fill
-                    className="object-contain"
+                    className="object-cover"
                     priority
                   />
                 </div>

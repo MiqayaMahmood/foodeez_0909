@@ -27,6 +27,7 @@ async function uploadImagesToStrapi(images: File[]): Promise<string[]> {
   for (const image of images) {
     const formData = new FormData();
     formData.append('files', image);
+    formData.append('folder', '14');
     const res = await fetch(`${STRAPI_URL}/api/upload`, {
       method: 'POST',
       headers: {

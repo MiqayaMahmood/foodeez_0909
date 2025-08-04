@@ -19,7 +19,7 @@ export default function CategoryFilter({
 }) {
   return (
     <div className=" border border-accent mb-8 bg-secondary-light rounded-lg text-accent-dark">
-      <div className="grid grid-cols-2 lg:flex gap-y-2 relative">
+      <div className="grid grid-cols-2 lg:flex gap-2 relative">
         {visibleCategories.map((category) => {
           const isSelected = selectedCategory === category.CATEGORY;
           const displayName = category.CATEGORY
@@ -30,7 +30,7 @@ export default function CategoryFilter({
               key={category.BUSINESS_CATEGORY_ID}
               onClick={() => onSelect(category.CATEGORY || "")}
               className={cn(
-                "lg:px-10 py-2 text-sm md:text-base transition-colors relative text-center",
+                "lg:px-6 py-2 text-sm md:text-base transition-colors relative text-center",
 
                 isSelected
                   ? "bg-primary text-white"
@@ -67,7 +67,7 @@ export default function CategoryFilter({
               placeholder="More Categories"
               openOnHover={true}
               disabled={isPending}
-              buttonClassName="w-full lg:px-10 py-2 text-sm md:text-base text-center"
+              buttonClassName="w-full lg:px-6 py-2 text-sm md:text-base text-center"
               menuClassName="md:w-56"
             />
           </div>

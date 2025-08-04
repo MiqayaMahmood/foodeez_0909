@@ -3,9 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import sharp from 'sharp';
-import { writeFile, mkdir, unlink } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { StrapiFileService } from '@/services/StrapiFileService';
 
 export async function POST(request: Request) {
   try {
@@ -40,31 +38,18 @@ export async function POST(request: Request) {
       .jpeg({ quality: 80 })
       .toBuffer();
 
-    // Generate filename using email only (without timestamp)
-    const filename = `${session.user.email}.jpg`;
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'profile-images');
-    
-    // Ensure directory exists
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
+    // Create blob from optimized buffer
+    const blob = new Blob([optimizedBuffer], { type: 'image/jpeg' });
+
+    // Upload to Strapi using the service (this will automatically delete previous images)
+    const imageUrl = await StrapiFileService.uploadProfileImage(blob as File, session.user.email);
+
+    if (!imageUrl) {
+      return NextResponse.json(
+        { error: 'Failed to upload image to Strapi' },
+        { status: 500 }
+      );
     }
-
-    // Delete existing image if it exists
-    const existingImagePath = join(uploadDir, filename);
-    if (existsSync(existingImagePath)) {
-      await unlink(existingImagePath);
-    }
-
-    // Save the new file
-    await writeFile(existingImagePath, optimizedBuffer);
-
-    // Get the base URL from the request
-    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-    const host = request.headers.get('host') || 'localhost:3000';
-    const baseUrl = `${protocol}://${host}`;
-
-    // Create full URL for the image
-    const imageUrl = `${baseUrl}/uploads/profile-images/${filename}`;
 
     // Update user profile in database
     await prisma.visitors_account.update({

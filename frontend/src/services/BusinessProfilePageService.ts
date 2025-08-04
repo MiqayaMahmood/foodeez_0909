@@ -30,7 +30,6 @@ export async function getBusinessById(id: number) {
 }
 
 export async function getBusinessReviewsForUser(businessId: number, userId?: number) {
-  console.log(`User Id ${userId}`)
   try {
     const whereClause: any = {
       BUSINESS_ID: businessId,

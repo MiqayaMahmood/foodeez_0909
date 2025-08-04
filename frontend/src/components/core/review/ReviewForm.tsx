@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent, useRef } from 'react';
-import { Star, UploadCloud, Trash2, Loader2, Info, CheckCircle } from 'lucide-react';
+import { Star, Trash2, Loader2, Info, CheckCircle, ImageIcon, Video } from 'lucide-react';
 import Image from 'next/image';
 
 const MAX_IMAGES = 3;
@@ -89,6 +89,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     for (const image of images) {
       const formData = new FormData();
       formData.append('files', image);
+      formData.append('folder', '9');
       const res = await fetch(`${STRAPI_URL}/api/upload`, {
         method: 'POST',
         headers: {
@@ -108,6 +109,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
   async function uploadVideoToStrapi(video: File): Promise<string | null> {
     const formData = new FormData();
     formData.append('files', video);
+    formData.append('folder', '9');
     const res = await fetch(`${STRAPI_URL}/api/upload`, {
       method: 'POST',
       headers: {
@@ -189,8 +191,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
               <Star
                 size={40}
                 className={
-                  star <= displayRating 
-                    ? 'text-highlight fill-highlight drop-shadow' 
+                  star <= displayRating
+                    ? 'text-highlight fill-highlight drop-shadow'
                     : 'text-gray-300'
                 }
               />
@@ -229,11 +231,10 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
             Photos ({images.length}/{MAX_IMAGES})
           </label>
           <div
-            className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${
-              images.length >= MAX_IMAGES
+            className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${images.length >= MAX_IMAGES
                 ? 'border-gray-200 bg-gray-50 text-gray-400'
                 : 'border-primary/40 hover:border-primary hover:bg-primary/5 text-primary'
-            }`}
+              }`}
             onClick={() => images.length < MAX_IMAGES && imageInputRef.current?.click()}
             onDragOver={handleDragOver}
             onDrop={handleImageDrop}
@@ -247,10 +248,10 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
               className="hidden"
               disabled={images.length >= MAX_IMAGES}
             />
-            <UploadCloud size={32} className="mx-auto mb-3 text-primary" />
+            <ImageIcon size={32} className="mx-auto mb-3 text-primary" />
             <p className="font-medium">
-              {images.length >= MAX_IMAGES 
-                ? 'Maximum reached' 
+              {images.length >= MAX_IMAGES
+                ? 'Maximum reached'
                 : 'Click or drag to upload'}
             </p>
             <p className="text-sm mt-1 text-text-light">JPEG, PNG up to 5MB each</p>
@@ -284,11 +285,10 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
             Video (optional)
           </label>
           <div
-            className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${
-              video
+            className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${video
                 ? 'border-gray-200 bg-gray-50 text-gray-400'
                 : 'border-primary/40 hover:border-primary hover:bg-primary/5 text-primary'
-            }`}
+              }`}
             onClick={() => !video && videoInputRef.current?.click()}
             onDragOver={handleDragOver}
             onDrop={handleVideoDrop}
@@ -301,7 +301,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
               className="hidden"
               disabled={!!video}
             />
-            <UploadCloud size={32} className="mx-auto mb-3 text-primary" />
+            <Video size={32} className="mx-auto mb-3 text-primary" />
             <p className="font-medium">
               {video ? 'Video uploaded' : 'Click or drag to upload'}
             </p>
@@ -344,11 +344,10 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
       <button
         type="submit"
         disabled={loading}
-        className={`w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg transition-all duration-300 ${
-          loading 
-            ? 'bg-gray-400 cursor-not-allowed' 
+        className={`w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg transition-all duration-300 ${loading
+            ? 'bg-gray-400 cursor-not-allowed'
             : 'bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary hover:shadow-xl'
-        } disabled:opacity-70 disabled:cursor-not-allowed`}
+          } disabled:opacity-70 disabled:cursor-not-allowed`}
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
