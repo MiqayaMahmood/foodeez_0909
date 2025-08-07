@@ -18,6 +18,7 @@ import BusinessGrid from "./BusinessGrid";
 import PaginationControls, { PER_PAGE_OPTIONS } from "./PaginationControls";
 import CitySelectionButtons from "../CitySection/CitySelectionButtons";
 import SearchBar from "./SearchBar";
+import GoogleMapsProvider from "@/components/providers/GoogleMapsProvider";
 
 const FOOD_TYPES = ["All", "Halal", "Vegetarian", "Vegan"] as const;
 const INITIAL_FOOD_TYPE = "All";
@@ -257,12 +258,14 @@ export default function FeaturedBusiness() {
       />
 
       {/* Hero with Search */}
-      <SearchBar
-        query={query}
-        zipcode={searchZipCode}
-        onSearch={handleSearch}
-        isLoading={isPending}
-      />
+      <GoogleMapsProvider>
+        <SearchBar
+          query={query}
+          zipcode={searchZipCode}
+          onSearch={handleSearch}
+          isLoading={isPending}
+        />
+      </GoogleMapsProvider>
 
       <ResultCountInfo
         visibleCount={businesses.length}

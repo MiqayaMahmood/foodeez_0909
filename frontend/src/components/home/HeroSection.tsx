@@ -109,8 +109,9 @@ const HeroSection = () => {
                   <Image
                     src={banner.src}
                     alt={banner.alt}
-                    fill
-                    className="object-contain"
+                    width={720}
+                    height={400}
+                    className="w-full h-[560px] object-contain"
                     priority
                   />
                 </div>

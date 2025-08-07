@@ -41,15 +41,22 @@ export interface GooglePlaceDetails {
   photos: GooglePhoto[];
   openingHours: OpeningHourDay[];
   isOpenNow: boolean;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
 }
 
 export async function fetchGooglePlaceDetails(placeId: string): Promise<GooglePlaceDetails> {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
   if (!apiKey) throw new Error("Google API key is not set");
   if (!placeId) throw new Error("Place ID is required");
 
   const proxy = "https://cors-anywhere.herokuapp.com/";
-  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,user_ratings_total,reviews,url,opening_hours,formatted_phone_number,website,photos&key=${apiKey}`;
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,user_ratings_total,reviews,url,opening_hours,formatted_phone_number,website,photos,geometry&key=${apiKey}`;
 
   try {
     const res = await fetch(proxy + url);
@@ -59,7 +66,7 @@ export async function fetchGooglePlaceDetails(placeId: string): Promise<GooglePl
       throw new Error(data.error_message || "Failed to fetch place details");
     }
 
-    const reviews: GoogleReview[] = (data.result.reviews || []).map((review: any) => ({
+    const reviews: GoogleReview[] = (data.result.reviews || []).slice(0, 5).map((review: any) => ({
       author_name: review.author_name,
       rating: review.rating,
       text: review.text,
@@ -77,7 +84,6 @@ export async function fetchGooglePlaceDetails(placeId: string): Promise<GooglePl
     let openingHours: OpeningHourDay[] = [];
     if (data.result.opening_hours && data.result.opening_hours.weekday_text) {
       openingHours = data.result.opening_hours.weekday_text.map((text: string) => {
-        // text: "Monday: 11:45 AM – 2:15 PM, 6:00 – 10:00 PM"
         const [day, ...hoursArr] = text.split(": ");
         return {
           day,
@@ -96,6 +102,7 @@ export async function fetchGooglePlaceDetails(placeId: string): Promise<GooglePl
       photos,
       openingHours,
       isOpenNow,
+      geometry: data.result.geometry,
     };
   } catch (err) {
     console.error("Error fetching place details:", err);

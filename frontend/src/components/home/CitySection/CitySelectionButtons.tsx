@@ -35,7 +35,7 @@ export default function CitySelectionButtons({
         ))}
 
         {otherCities.length > 0 && (
-          <div className="relative min-w-[10rem] lg:w-auto">
+          <div className="relative w-full lg:w-auto">
             <SelectDropdown
               options={otherCities.map(city => ({ label: city, value: city }))}
               selectedValue={otherCities.includes(selectedCity) ? selectedCity : ''}

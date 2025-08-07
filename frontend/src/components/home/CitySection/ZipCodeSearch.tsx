@@ -1,30 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { MapPin, Search, X } from "lucide-react";
 import { motion } from "framer-motion";
 import GoogleMapsProvider from "@/components/providers/GoogleMapsProvider";
+import { useGoogleMapsAutocomplete } from "@/lib/hooks/useGoogleMapsAutocomplete";
 
 interface ZipCodeSearchProps {
   zipCode: string;
   setZipCode: (zip: string) => void;
   setSearchZipCode: (zip: string) => void;
   onSearchSubmit: (zip: string) => void;
-}
-
-declare global {
-  interface Window {
-    google?: {
-      maps: {
-        places: {
-          Autocomplete: new (
-            input: HTMLInputElement,
-            options?: google.maps.places.AutocompleteOptions
-          ) => google.maps.places.Autocomplete;
-        };
-      };
-    }
-  }
 }
 
 export default function ZipCodeSearch({
@@ -34,57 +20,29 @@ export default function ZipCodeSearch({
   onSearchSubmit,
 }: ZipCodeSearchProps) {
   const [isFocused, setIsFocused] = useState(false);
-  const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (window.google?.maps?.places) {
-      setIsGoogleMapsLoaded(true);
-      return;
-    }
-
-    const checkInterval = setInterval(() => {
-      if (window.google?.maps?.places) {
-        setIsGoogleMapsLoaded(true);
-        clearInterval(checkInterval);
-      }
-    }, 100);
-
-    return () => clearInterval(checkInterval);
-  }, []);
-
-  useEffect(() => {
-    if (!isGoogleMapsLoaded || !inputRef.current) return;
-
-    try {
-      autocompleteRef.current = new google.maps.places.Autocomplete(
-        inputRef.current,
-        {
-          types: ["(regions)"],
-          componentRestrictions: { country: "ch" },
-          fields: ["address_components", "formatted_address"],
-        }
+  const handlePlaceSelect = (place: google.maps.places.PlaceResult) => {
+    if (place?.address_components) {
+      const postalCodeComponent = place.address_components.find((comp) =>
+        comp.types.includes("postal_code")
       );
-
-      autocompleteRef.current.addListener("place_changed", () => {
-        const place = autocompleteRef.current?.getPlace();
-        if (place?.address_components) {
-          const postalCodeComponent = place.address_components.find((comp) =>
-            comp.types.includes("postal_code")
-          );
-          if (postalCodeComponent) {
-            const zipOnly = postalCodeComponent.long_name.trim();
-            setZipCode(zipOnly);
-            setSearchZipCode(zipOnly);
-            onSearchSubmit(zipOnly);
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Google Places Autocomplete error:", error);
+      if (postalCodeComponent) {
+        const zipOnly = postalCodeComponent.long_name.trim();
+        setZipCode(zipOnly);
+        setSearchZipCode(zipOnly);
+        onSearchSubmit(zipOnly);
+      }
     }
-  }, [isGoogleMapsLoaded, setZipCode, setSearchZipCode, onSearchSubmit]);
+  };
+
+  const { isLoaded, error } = useGoogleMapsAutocomplete({
+    inputRef,
+    onPlaceSelect: handlePlaceSelect,
+    types: ['(regions)'],
+    componentRestrictions: { country: 'ch' },
+    fields: ['address_components', 'formatted_address'],
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,6 +115,12 @@ export default function ZipCodeSearch({
             <span className="hidden sm:inline">Search</span>
           </motion.button>
         </div>
+        
+        {error && (
+          <div className="mt-2 text-sm text-red-600 text-center">
+            {error}
+          </div>
+        )}
       </motion.form>
     </GoogleMapsProvider>
   );

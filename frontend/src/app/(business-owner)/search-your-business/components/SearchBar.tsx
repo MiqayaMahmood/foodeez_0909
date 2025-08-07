@@ -69,11 +69,6 @@ export default function SearchBar({
 
   return (
     <>
-      <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-        strategy="beforeInteractive"
-      />
-      
       <div className="py-16">
         <motion.form
           initial={{ opacity: 0, y: 30 }}

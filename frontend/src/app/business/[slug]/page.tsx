@@ -22,6 +22,7 @@ import {
 } from "@/services/BusinessProfilePageService";
 import { business_detail_view_all } from "@prisma/client";
 import Separator from "@/components/ui/separator";
+import GoogleMapsProvider from "@/components/providers/GoogleMapsProvider";
 
 const BusinessDetailPage = () => {
   const slug = useParams();
@@ -159,8 +160,9 @@ const BusinessDetailPage = () => {
 
           <Separator />
 
-          {/* Google Map */}
+        
           <MapCard placeId={placeId} />
+          
         </div>
       </div>
     </>

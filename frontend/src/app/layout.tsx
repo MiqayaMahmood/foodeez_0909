@@ -41,6 +41,7 @@ export default function RootLayout({
       </head>
       <body className="flex flex-col font-sans bg-background max-w-[1440px] mx-auto min-h-screen">
         <AuthProvider>
+       
           <AnnouncementBar1 />
           <AnnouncementBar2 />
           <Navbar />
@@ -48,6 +49,7 @@ export default function RootLayout({
           <main className="">{children}</main>
           <Footer />
           <Toaster position="bottom-right" />
+          
         </AuthProvider>
       </body>
     </html>

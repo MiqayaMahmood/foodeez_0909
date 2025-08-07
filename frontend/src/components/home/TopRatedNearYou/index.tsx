@@ -93,7 +93,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
             setUserLocation(location);
             setLocationEnabled(true);
 
-            await fetchRestaurants(userLocation);
+            await fetchRestaurants(location);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to get location");
             setLocationEnabled(false);
@@ -135,9 +135,9 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
             setError("Geolocation is not supported by this browser.");
             setInitialLocationCheck(false);
             // Try with default coordinates as fallback
-            fetchRestaurants(userLocation);
+            fetchRestaurants({ lat: 0, lng: 0 });
         }
-    }, [fetchRestaurants, userLocation]);
+    }, [fetchRestaurants]);
 
     // Don't render the component if no restaurants found
     if (!shouldRender) {

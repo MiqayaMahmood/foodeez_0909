@@ -3,6 +3,9 @@
 import React from "react";
 import { LoadScript } from "@react-google-maps/api";
 
+// Static libraries array to prevent reloading
+const LIBRARIES: ("places" | "geometry" | "drawing" | "visualization")[] = ["places"];
+
 interface GoogleMapsProviderProps {
   children: React.ReactNode;
 }
@@ -20,7 +23,7 @@ export default function GoogleMapsProvider({ children }: GoogleMapsProviderProps
   }
 
   return (
-    <LoadScript googleMapsApiKey={apiKey} libraries={["places"]}>
+    <LoadScript googleMapsApiKey={apiKey} libraries={LIBRARIES}>
       {children}
     </LoadScript>
   );

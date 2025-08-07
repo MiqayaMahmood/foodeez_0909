@@ -19,6 +19,7 @@ import BusinessProfilePageLoadingSkeleton from "./components/BusinessProfilePage
 import { BusinessDetail } from "@/types/business.types";
 import { getBusinessById } from "@/services/BusinessProfilePageService";
 import Separator from "@/components/ui/separator";
+import GoogleMapsProvider from "@/components/providers/GoogleMapsProvider";
 
 const ManageBusinessDetailPage = () => {
   const [business, setBusiness] = useState<BusinessDetail | null>(null);
@@ -183,7 +184,9 @@ const ManageBusinessDetailPage = () => {
           <Separator />
 
           {/* Google Map */}
-          <MapCard placeId={placeId} />
+          <GoogleMapsProvider>
+            <MapCard placeId={placeId} />
+          </GoogleMapsProvider>
         </div>
       </div>
     </>

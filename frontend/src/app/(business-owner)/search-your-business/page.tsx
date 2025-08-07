@@ -18,6 +18,7 @@ import { BusinessDetail } from "@/types/business.types";
 // import { Filter } from "lucide-react";
 import { motion } from "framer-motion";
 import SearchBar from "./components/SearchBar";
+import GoogleMapsProvider from "@/components/providers/GoogleMapsProvider";
 
 
 function SearchYourBusiness() {
@@ -150,11 +151,13 @@ function SearchYourBusiness() {
       </motion.div>
 
       {/* Hero with Search */}
-      <SearchBar
-        query={currentQuery}
-        onSearch={handleSearch}
-        isLoading={isPending}
-      />
+      <GoogleMapsProvider>
+        <SearchBar
+          query={currentQuery}
+          onSearch={handleSearch}
+          isLoading={isPending}
+        />
+      </GoogleMapsProvider>
 
       <div className="py-8">
         {/* Results Info and Sorting */}

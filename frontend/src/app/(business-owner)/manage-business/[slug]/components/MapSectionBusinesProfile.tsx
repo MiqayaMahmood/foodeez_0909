@@ -1,6 +1,7 @@
-import { useState, useRef } from "react";
-import { GoogleMap, LoadScript } from "@react-google-maps/api";
-import { Card } from "@/components/ui/card"; // Adjust path as needed
+import { useState, useEffect } from "react";
+import { GoogleMap } from "@react-google-maps/api";
+import { Card } from "@/components/ui/card";
+import { googleMapsService } from "@/lib/services/GoogleMapsService";
 
 interface MapCardProps {
   placeId: string;
@@ -16,46 +17,71 @@ export default function MapCard({ placeId }: MapCardProps) {
     throw new Error("Place ID is required to display the map.");
   }
 
-  const [center, setCenter] = useState<{ lat: number; lng: number } | null>(
-    null
-  );
-  const mapRef = useRef<google.maps.Map | null>(null);
+  const [center, setCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLoad = (map: google.maps.Map) => {
-    mapRef.current = map;
+  useEffect(() => {
+    const fetchPlaceDetails = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const coordinates = await googleMapsService.getCoordinates(placeId);
+        
+        if (coordinates) {
+          setCenter(coordinates);
+        } else {
+          setError("Could not fetch location details");
+        }
+      } catch (err) {
+        console.error("Error fetching place details:", err);
+        setError("Failed to load map location");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
     if (placeId) {
-      const service = new google.maps.places.PlacesService(map);
-      service.getDetails({ placeId }, (place, status) => {
-        if (
-          status === google.maps.places.PlacesServiceStatus.OK &&
-          place?.geometry?.location
-        ) {
-          setCenter({
-            lat: place.geometry.location.lat(),
-            lng: place.geometry.location.lng(),
-          });
-        }
-      });
+      fetchPlaceDetails();
     }
-  };
+  }, [placeId]);
+
+  if (isLoading) {
+    return (
+      <Card className="p-8 flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-gray-500">Loading map...</p>
+        </div>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-8 flex items-center justify-center h-64">
+        <div className="text-center">
+          <h3 className="text-xl font-semibold text-red-600">Map Error</h3>
+          <p className="text-gray-500 mt-2">{error}</p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="">
-      {placeId ? (
-        <LoadScript
-          googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
-          libraries={["places"]}
-        >
-          <GoogleMap
-            mapContainerStyle={{ height: "400px", width: "100%" }}
-            center={center || { lat: 0, lng: 0 }}
-            zoom={center ? 15 : 1}
-            onLoad={handleLoad}
-          />
-         
-          
-        </LoadScript>
+      {center ? (
+        <GoogleMap
+          mapContainerStyle={{ height: "400px", width: "100%" }}
+          center={center}
+          zoom={15}
+          options={{
+            mapTypeControl: true,
+            streetViewControl: true,
+            fullscreenControl: true,
+          }}
+        />
       ) : (
         <div className="p-8 flex items-center justify-center h-64">
           <div className="text-center">
