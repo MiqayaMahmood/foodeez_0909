@@ -1,8 +1,9 @@
 import { SocialLinks } from "@/components/core/SocialLinks";
 import { MapPin, Phone, Globe } from "lucide-react";
 import { BusinessDetail } from "@/types/business.types";
+import { business_detail_view_all } from "@prisma/client";
 
-const BusinessInfoSection: React.FC<{ business: BusinessDetail }> = ({
+const BusinessInfoSection: React.FC<{ business: business_detail_view_all }> = ({
   business,
 }) => {
 

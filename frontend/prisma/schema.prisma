@@ -25,6 +25,7 @@ model adlinks {
 model business {
   BUSINESS_ID        Int                @id @default(autoincrement())
   CREATION_DATETIME  DateTime           @db.DateTime(0)
+  PLACE_ID           String?            @db.VarChar(100)
   BUSINESS_NAME      String?            @db.VarChar(255)
   SHORT_NAME         String?            @db.VarChar(20)
   DESCRIPTION        String?            @db.VarChar(1000)
@@ -92,17 +93,6 @@ model business_rating {
   CREATION_DATETIME  DateTime? @db.DateTime(0)
   BUSINESS_ID        BigInt?
   BUSINESS_RATING    Int?
-}
-
-model business_reviews {
-  BUSINESS_REVIEWS_ID BigInt    @id @default(autoincrement())
-  CREATION_DATETIME   DateTime? @db.DateTime(0)
-  REVIEWER_NAME       String?   @db.VarChar(255)
-  RATING              Int?
-  REVIEW              String?   @db.VarChar(1000)
-  PIC_1               String?   @db.VarChar(255)
-  PIC_2               String?   @db.VarChar(255)
-  PIC_3               String?   @db.VarChar(255)
 }
 
 model city {
@@ -471,6 +461,41 @@ model visitor_food_journey {
   APPROVED                Int?      @default(0) @db.TinyInt
 }
 
+model business_google_reviews {
+  BUSINESS_GOOGLE_REVIEWS_ID Int       @id @default(autoincrement())
+  CREATION_DATETIME          DateTime? @db.DateTime(0)
+  BUSINESS_ID                Int?
+  PLACE_ID                   String?   @db.VarChar(255)
+  AUTHOR                     String?   @db.VarChar(100)
+  RATING                     String?   @db.VarChar(5)
+  REVIEW                     String?   @db.Text
+  RELATIVE_TIME              String?   @db.VarChar(45)
+  PROFILE_PHOTO_URL          String?   @db.VarChar(255)
+}
+
+model business_opening_hours {
+  BUSINESS_OPENING_HOURS_ID Int       @id @default(autoincrement())
+  CREATION_DATETIME         DateTime? @db.DateTime(0)
+  BUSINESS_ID               Int?
+  PLACE_ID                  String?   @db.VarChar(100)
+  DAY                       String?   @db.VarChar(45)
+  OPEN_1                    String?   @db.VarChar(45)
+  CLOSE_1                   String?   @db.VarChar(45)
+  OPEN_2                    String?   @db.VarChar(45)
+  CLOSE_2                   String?   @db.VarChar(45)
+  REMARKS                   String?   @db.VarChar(45)
+}
+
+model business_google_images {
+  BUSINESS_GOOGLE_IMAGES_ID Int       @id @default(autoincrement())
+  CREATION_DATETIME         DateTime? @db.DateTime(0)
+  BUSINESS_ID               Int?
+  PLACE_ID                  String?   @db.VarChar(100)
+  IMAGE_URL                 String?   @db.VarChar(1000)
+  WIDTH                     String    @db.VarChar(45)
+  HEIGHT                    String    @db.VarChar(45)
+}
+
 view adlink_view {
   ADLINK_ID     Int     @id @default(0)
   BUSINESS_NAME String? @db.VarChar(255)
@@ -495,6 +520,7 @@ view business_category_view {
 
 view business_detail_view_all {
   BUSINESS_ID             Int     @id @default(0)
+  PLACE_ID                String? @db.VarChar(100)
   BUSINESS_NAME           String? @db.VarChar(255)
   SHORT_NAME              String? @db.VarChar(20)
   DESCRIPTION             String? @db.VarChar(1000)
@@ -530,6 +556,7 @@ view business_detail_view_all {
 
 view business_detail_view_halal {
   BUSINESS_ID             Int     @id @default(0)
+  PLACE_ID                String? @db.VarChar(100)
   BUSINESS_NAME           String? @db.VarChar(255)
   SHORT_NAME              String? @db.VarChar(20)
   DESCRIPTION             String? @db.VarChar(1000)
@@ -565,6 +592,7 @@ view business_detail_view_halal {
 
 view business_detail_view_vegan {
   BUSINESS_ID             Int     @id @default(0)
+  PLACE_ID                String? @db.VarChar(100)
   BUSINESS_NAME           String? @db.VarChar(255)
   SHORT_NAME              String? @db.VarChar(20)
   DESCRIPTION             String? @db.VarChar(1000)
@@ -600,6 +628,7 @@ view business_detail_view_vegan {
 
 view business_detail_view_vegetarian {
   BUSINESS_ID             Int     @id @default(0)
+  PLACE_ID                String? @db.VarChar(100)
   BUSINESS_NAME           String? @db.VarChar(255)
   SHORT_NAME              String? @db.VarChar(20)
   DESCRIPTION             String? @db.VarChar(1000)
@@ -765,4 +794,40 @@ view business_having_active_menu_card_view {
   BUSINESS_ID Int?
 
   @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view business_google_review_view {
+  BUSINESS_GOOGLE_REVIEWS_ID Int       @id @default(0)
+  CREATION_DATETIME          DateTime? @db.DateTime(0)
+  BUSINESS_ID                Int?      @default(0)
+  PLACE_ID                   String?   @db.VarChar(255)
+  AUTHOR                     String?   @db.VarChar(100)
+  RATING                     String?   @db.VarChar(5)
+  REVIEW                     String?   @db.Text
+  RELATIVE_TIME              String?   @db.VarChar(45)
+  PROFILE_PHOTO_URL          String?   @db.VarChar(255)
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view business_opening_hours_view {
+  BUSINESS_OPENING_HOURS_ID Int     @id @default(0)
+  BUSINESS_ID               Int?
+  PLACE_ID                  String? @db.VarChar(100)
+  DAY                       String? @db.VarChar(45)
+  OPEN_1                    String? @db.VarChar(45)
+  CLOSE_1                   String? @db.VarChar(45)
+  OPEN_2                    String? @db.VarChar(45)
+  CLOSE_2                   String? @db.VarChar(45)
+  REMARKS                   String? @db.VarChar(45)
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view business_google_images_view {
+  BUSINESS_GOOGLE_IMAGES_ID Int     @id @default(0)
+  BUSINESS_ID               Int?
+  PLACE_ID                  String? @db.VarChar(100)
+  IMAGE_URL                 String? @db.VarChar(1000)
+  WIDTH                     String  @db.VarChar(45)
+  HEIGHT                    String  @db.VarChar(45)
 }

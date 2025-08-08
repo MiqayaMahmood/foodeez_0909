@@ -4,8 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
-import { GoogleReview } from "./fetchGooglePlaceDetails";
 import { motion } from "framer-motion";
+import { GoogleReview } from "@/types/google-business";
 
 interface GoogleReviewsProps {
   reviews: GoogleReview[];

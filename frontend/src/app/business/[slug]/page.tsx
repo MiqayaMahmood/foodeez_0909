@@ -6,32 +6,26 @@ import BusinessImage from "./components/BusinessImage";
 import React, { useState, useEffect } from "react";
 import MapCard from "./components/MapSectionBusinesProfile";
 import GooglePhotoGallery from "./components/PhotoGallary";
-import {
-  fetchGooglePlaceDetails,
-  GooglePlaceDetails,
-} from "./components/fetchGooglePlaceDetails";
-import { extractPlaceIdFromUrl } from "@/lib/utils/google";
 import GoogleReviews from "./components/GoogleReviews";
 import OpeningHours from "./components/OpeningHoursSection";
 import BusinessInfoSection from "./components/BusinessInfoSection";
 import BusinessProfilePageLoadingSkeleton from "./components/BusinessProfilePageLoadingSkeleton";
 import ResturantProfilePageHeader from "./components/ResturantProfilePageHeader";
 import FoodeezReviews from "./components/FoodeezReviews";
-import {
-  getBusinessById,
-} from "@/services/BusinessProfilePageService";
+import { getBusinessById } from "@/services/BusinessProfilePageService";
 import { business_detail_view_all } from "@prisma/client";
 import Separator from "@/components/ui/separator";
-import GoogleMapsProvider from "@/components/providers/GoogleMapsProvider";
+import { BusinessGoogleData, BusinessGoogleDataResponse } from "@/types/google-business";
 
 const BusinessDetailPage = () => {
   const slug = useParams();
   const parsedId = parseSlug(slug?.slug as unknown as string);
 
   const [business, setBusiness] = useState<business_detail_view_all | null>(null);
-  const [placeId, setPlaceId] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [googleBusinessData, setGoogleBusinessData] = useState<GooglePlaceDetails>();
+  const [googleBusinessData, setGoogleBusinessData] = useState<BusinessGoogleData>();
+  const [googleDataLoading, setGoogleDataLoading] = useState(false);
+  const [googleDataError, setGoogleDataError] = useState<string | null>(null);
 
   const genSlug = generateSlug(
     business?.BUSINESS_NAME || "business",
@@ -43,12 +37,7 @@ const BusinessDetailPage = () => {
       const data = await getBusinessById(Number(parsedId.id));
 
       setBusiness(data as business_detail_view_all);
-
-      // ✅ Extract place ID from Google profile
-      const placeId = extractPlaceIdFromUrl(String(data?.GOOGLE_PROFILE || ""));
-      setPlaceId(placeId);
-
-      setLoading(false); // ✅ Only set loading to false after data is fetched
+      setLoading(false);
     }
 
     fetchBusiness();
@@ -57,22 +46,47 @@ const BusinessDetailPage = () => {
   useEffect(() => {
     let isMounted = true;
 
-    if (!placeId) return;
+    if (!business?.BUSINESS_ID) return;
 
-    fetchGooglePlaceDetails(placeId)
-      .then((data) => {
+    const fetchGoogleData = async () => {
+      setGoogleDataLoading(true);
+      setGoogleDataError(null);
+
+      try {
+        const response = await fetch(`/api/business-google-data/${business.BUSINESS_ID}`);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch Google data: ${response.statusText}`);
+        }
+
+        const data: BusinessGoogleDataResponse = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || 'Unknown error occurred');
+        }
+
         if (isMounted) {
           setGoogleBusinessData(data);
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching Google place details:", error);
-      });
+        if (isMounted) {
+          setGoogleDataError(error instanceof Error ? error.message : 'Failed to load Google data');
+        }
+      } finally {
+        if (isMounted) {
+          setGoogleDataLoading(false);
+        }
+      }
+    };
+
+    fetchGoogleData();
 
     return () => {
       isMounted = false;
     };
-  }, [placeId]);
+  }, [business?.BUSINESS_ID]);
+
   if (loading) {
     return <BusinessProfilePageLoadingSkeleton />;
   }
@@ -84,15 +98,6 @@ const BusinessDetailPage = () => {
       </div>
     );
   }
-
-  // // Meta data
-  // const title = business.BUSINESS_NAME
-  //   ? `${business.BUSINESS_NAME} | Foodeez`
-  //   : "Business | Foodeez";
-  // const description =
-  //   business.DESCRIPTION || "Discover this business on Foodeez.";
-  // const image = business.IMAGE_URL || "/default-business.jpg";
-  // const url = typeof window !== "undefined" ? window.location.href : "";
 
   return (
     <>
@@ -119,16 +124,32 @@ const BusinessDetailPage = () => {
 
           <Separator />
 
-          <GooglePhotoGallery
-            photos={googleBusinessData?.photos || []}
-            businessName={googleBusinessData?.name || business.BUSINESS_NAME || ''}
-          />
+          {googleDataLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="text-gray-500">Loading Google photos...</div>
+            </div>
+          ) : googleDataError ? (
+            <div className="text-red-500 text-center py-4">
+              Error loading photos: {googleDataError}
+            </div>
+          ) : (
+            <GooglePhotoGallery
+              photos={googleBusinessData?.photos || []}
+              businessName={googleBusinessData?.name || business.BUSINESS_NAME || ''}
+            />
+          )}
 
           {/* Opening Hours */}
-          <OpeningHours
-            openingHours={googleBusinessData?.openingHours || []}
-            isOpenNow={googleBusinessData?.isOpenNow || false}
-          />
+          {googleDataLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="text-gray-500">Loading opening hours...</div>
+            </div>
+          ) : (
+            <OpeningHours
+              openingHours={googleBusinessData?.openingHours || []}
+              isOpenNow={googleBusinessData?.isOpenNow || false}
+            />
+          )}
 
           {/* Action Buttons */}
           {/* <ActionButtons
@@ -145,24 +166,28 @@ const BusinessDetailPage = () => {
 
           <Separator />
 
-
           {/* Reviews */}
-
           <div className="">
             <FoodeezReviews genSlug={genSlug} business={business} />
           </div>
           <div className="">
-            <GoogleReviews
-              reviews={googleBusinessData?.reviews || []}
-              GOOGLE_PROFILE={business.GOOGLE_PROFILE || ""}
-            />
+            {googleDataLoading ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="text-gray-500">Loading Google reviews...</div>
+              </div>
+            ) : (
+              <GoogleReviews
+                reviews={googleBusinessData?.reviews || []}
+                GOOGLE_PROFILE={business.GOOGLE_PROFILE || ""}
+              />
+            )}
           </div>
 
           <Separator />
 
-        
-          <MapCard placeId={placeId} />
-          
+
+          <MapCard placeId={business.PLACE_ID || ''} />
+
         </div>
       </div>
     </>

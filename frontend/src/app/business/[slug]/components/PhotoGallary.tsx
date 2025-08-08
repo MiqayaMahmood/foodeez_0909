@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { GooglePhoto } from "./fetchGooglePlaceDetails";
 import { Camera } from "lucide-react";
+import { GooglePhoto } from "@/types/google-business";
 
 interface GooglePhotoGalleryProps {
   photos: GooglePhoto[];
