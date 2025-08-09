@@ -15,6 +15,8 @@ import MenuHeroSection from "@/components/menu/MenuHeroSection";
 import MenuCategorySection from "@/components/menu/MenuCategorySection";
 import MenuSwitchSkeleton from "@/components/menu/MenuSwitchSkeleton";
 import MenuLoadingSkeleton from "@/components/menu/MenuLoadingSkeleton";
+import SEO from "@/components/seo/SEO";
+import { buildBusinessBreadcrumbs } from "@/lib/seo";
 
 export default function MenuPage() {
   const params = useParams();
@@ -105,20 +107,18 @@ export default function MenuPage() {
 
   return (
     <>
-      <head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:image" content={image} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={url} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={image} />
-        <link rel="canonical" href={url} />
-      </head>
+      <SEO
+        title={title}
+        description={description}
+        image={image}
+        url={url}
+        canonical={url}
+        type="website"
+        breadcrumbs={buildBusinessBreadcrumbs('https://foodeez.ch', [
+          { name: 'Business', url: `https://foodeez.ch/business/${slug}/menu` },
+          { name: 'Menu', url },
+        ])}
+      />
       <div className="px-4 lg:px-0">
         <MenuHeroSection
           business={business}

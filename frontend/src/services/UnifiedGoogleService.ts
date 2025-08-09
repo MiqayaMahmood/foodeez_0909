@@ -1,10 +1,9 @@
-import { 
-  GooglePhoto, 
-  GoogleReview, 
-  OpeningHourDay, 
+import {
+  GooglePhoto,
+  GoogleReview,
+  OpeningHourDay,
   BusinessGoogleData,
   GooglePlacesApiResponse,
-  GoogleGeometry
 } from '@/types/google-business';
 
 export class UnifiedGoogleService {
@@ -19,7 +18,7 @@ export class UnifiedGoogleService {
     if (!this.API_KEY) {
       throw new Error("Google API key is not configured");
     }
-    
+
     if (!placeId) {
       throw new Error("Place ID is required");
     }
@@ -100,7 +99,7 @@ export class UnifiedGoogleService {
     if (!this.API_KEY) {
       throw new Error("Google API key is not configured");
     }
-    
+
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photoreference=${photoReference}&key=${this.API_KEY}`;
   }
 }

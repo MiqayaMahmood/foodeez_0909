@@ -16,6 +16,8 @@ import { getBusinessById } from "@/services/BusinessProfilePageService";
 import { business_detail_view_all } from "@prisma/client";
 import Separator from "@/components/ui/separator";
 import { BusinessGoogleData, BusinessGoogleDataResponse } from "@/types/google-business";
+import SEO from "@/components/seo/SEO";
+import { buildBusinessBreadcrumbs, buildLocalBusinessSchema } from "@/lib/seo";
 
 const BusinessDetailPage = () => {
   const slug = useParams();
@@ -60,6 +62,7 @@ const BusinessDetailPage = () => {
         }
 
         const data: BusinessGoogleDataResponse = await response.json();
+        console.log(data);
 
         if (!data.success) {
           throw new Error(data.error || 'Unknown error occurred');
@@ -101,6 +104,19 @@ const BusinessDetailPage = () => {
 
   return (
     <>
+      {/* SEO */}
+      <SEO
+        title={business.BUSINESS_NAME || "Business"}
+        description={`Discover ${business.BUSINESS_NAME || "this restaurant"} on Foodeez. View photos, hours, reviews and more.`}
+        url={typeof window !== 'undefined' ? window.location.href : `https://foodeez.ch/business/${business.BUSINESS_ID}`}
+        canonical={typeof window !== 'undefined' ? window.location.href : undefined}
+        type="website"
+        breadcrumbs={buildBusinessBreadcrumbs('https://foodeez.ch', [
+          { name: business.CITY_NAME || 'City' },
+          { name: business.BUSINESS_NAME || 'Business', url: `https://foodeez.ch/business/${generateSlug(business.BUSINESS_NAME || 'business', business.BUSINESS_ID || 0)}` },
+        ])}
+        structuredData={buildLocalBusinessSchema(business, (googleBusinessData as unknown as BusinessGoogleData) || undefined, typeof window !== 'undefined' ? window.location.href : `https://foodeez.ch/business/${business.BUSINESS_ID}`)}
+      />
       <div className="">
         <ResturantProfilePageHeader
           BUSINESS_NAME={business.BUSINESS_NAME || ""}

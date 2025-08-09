@@ -8,6 +8,7 @@ import { Input } from "@/components/core/Input";
 import { Button } from "@/components/core/Button";
 import { FcGoogle } from "react-icons/fc";
 import Image from "next/image";
+import SEO from "@/components/seo/SEO";
 
 function SignInContent() {
   const router = useRouter();
@@ -190,12 +191,23 @@ function SignInContent() {
 
 export default function SignIn() {
   return (
-    <Suspense fallback={
+    <>
+      <SEO
+        title="Sign in"
+        description="Sign in to your Foodeez account."
+        url="https://foodeez.ch/auth/signin"
+        canonical="https://foodeez.ch/auth/signin"
+        noindex
+        nofollow
+        type="website"
+      />
+      <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     }>
       <SignInContent />
     </Suspense>
+    </>
   );
 }

@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, X, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
-import Script from "next/script";
 
 interface SearchBarProps {
   query : string;

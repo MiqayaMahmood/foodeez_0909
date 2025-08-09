@@ -36,7 +36,7 @@ export default function ZipCodeSearch({
     }
   };
 
-  const { isLoaded, error } = useGoogleMapsAutocomplete({
+  const { error } = useGoogleMapsAutocomplete({
     inputRef,
     onPlaceSelect: handlePlaceSelect,
     types: ['(regions)'],

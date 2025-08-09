@@ -1,88 +1,79 @@
 "use client";
 
-import BusinessCTA from "@/components/home/CTAs/BusinessCTA";
-// import CtaSection from "@/components/home/CTAs/CtaSection";
-import FaqSection from "@/components/home/FaqSection";
-import HeroSection from "@/components/home/HeroSection";
-import FeaturedBusiness from "@/components/home/FeaturedBusiness";
-import TopRatedNearYou from "@/components/home/TopRatedNearYou";
-// import QuickSearch from "@/components/home/QuickSearch";
-// import ScrollingBusinessBar from "@/components/home/ScrollingBusinessBar";
-import MapSection from "@/components/home/MapSection";
-import GoogleMapsProvider from "@/components/providers/GoogleMapsProvider";
-import AdsBar1 from "@/components/home/AdsBar1";
-import AdsBar2 from "@/components/home/AdsBar2";
-// import BenefitsSection from "@/components/home/BenefitsSection";
-// import AboutSection from "@/components/home/AboutSection";
-import TestimonialsSection from "@/components/home/FoodeezTestimonials/TestimonialsSection";
-import Separator from "@/components/ui/separator";
-import CommunitySection from "@/components/home/CommunitySection";
-import UpcomingEvents from "@/components/home/EventSection/UpcomingEvents";
-import FoodJourney from "@/components/home/CTAs/FoodJourney";
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+
+// Lazy load heavy components
+const BusinessCTA = dynamic(() => import('@/components/home/CTAs/BusinessCTA'));
+const FaqSection = dynamic(() => import('@/components/home/FaqSection'));
+const HeroSection = dynamic(() => import('@/components/home/HeroSection'));
+const FeaturedBusiness = dynamic(() => import('@/components/home/FeaturedBusiness'));
+const TopRatedNearYou = dynamic(() => import('@/components/home/TopRatedNearYou'));
+const MapSection = dynamic(() => import('@/components/home/MapSection'));
+const GoogleMapsProvider = dynamic(() => import('@/components/providers/GoogleMapsProvider'));
+const AdsBar1 = dynamic(() => import('@/components/home/AdsBar1'));
+const AdsBar2 = dynamic(() => import('@/components/home/AdsBar2'));
+const TestimonialsSection = dynamic(() => import('@/components/home/FoodeezTestimonials/TestimonialsSection'));
+const Separator = dynamic(() => import('@/components/ui/separator'));
+const CommunitySection = dynamic(() => import('@/components/home/CommunitySection'));
+const UpcomingEvents = dynamic(() => import('@/components/home/EventSection/UpcomingEvents'));
+const FoodJourney = dynamic(() => import('@/components/home/CTAs/FoodJourney'));
+
+// Loading fallback
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-[200px]">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
 
 export default function Home() {
   return (
     <div className="">
-      {/* Hero Section with Search */}
-      <AdsBar1 />
+      <Suspense fallback={<LoadingSpinner />}>
 
-      <HeroSection />
+        {/* Hero Section */}
+        <AdsBar1 />
+        <HeroSection />
+        <AdsBar2 />
+        <Separator />
 
-      <AdsBar2 />
-      <Separator />
+        {/* Top Rated Restaurants Near You */}
+        <TopRatedNearYou />
 
-      {/* Scrolling Business Bar */}
-      {/* <ScrollingBusinessBar /> */}
+        {/* Featured Business */}
+        <FeaturedBusiness />
+        <Separator />
 
-      {/* Top Rated Restaurants Near You */}
-      <TopRatedNearYou />
+        {/* Business CTA */}
+        <BusinessCTA />
+        <Separator />
 
-      {/* Featured Business Grid */}
-      <FeaturedBusiness />
+        {/* Food Journey CTA */}
+        <FoodJourney />
+        <Separator />
 
-      <Separator />
+        {/* Testimonials */}
+        <TestimonialsSection />
+        <Separator />
 
-      {/* Business CTA */}
-      <BusinessCTA />
+        {/* Upcoming Events */}
+        <UpcomingEvents />
+        <Separator />
 
-      <Separator />
+        {/* Community Section */}
+        <CommunitySection />
+        <Separator />
 
-      {/* Cities Section */}
-      {/* <CitySection/> */}
+        {/* FAQ Section */}
+        <FaqSection />
+        <Separator />
 
-      {/* About Section - We Are Foodeez */}
-      {/* <AboutSection /> */}
+        {/* Map Section */}
+        <GoogleMapsProvider>
+          <MapSection />
+        </GoogleMapsProvider>
 
-      {/* Food Journey CTA */}
-      <FoodJourney />
-
-      <Separator />
-
-      {/* Testimonials from Google Reviews */}
-      <TestimonialsSection />
-      <Separator />
-
-      {/* <QuickSearch /> */}
-
-      {/* Benefits Section */}
-      {/* <BenefitsSection />/ */}
-
-
-      {/* Main CTA Section */}
-      <UpcomingEvents />
-
-      <Separator />
-      {/* Community Section */}
-      <CommunitySection />
-      <Separator />
-      {/* FAQ Section */}
-      <FaqSection />
-
-      {/* Map  Section */}
-      <GoogleMapsProvider>
-        <MapSection />
-      </GoogleMapsProvider>
-
+      </Suspense>
     </div>
   );
 }

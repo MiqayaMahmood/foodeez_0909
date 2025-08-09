@@ -5,6 +5,7 @@ import { MapPin, Phone, Mail, Send } from "lucide-react";
 import { Input } from "@/components/core/Input";
 import { Button } from "@/components/core/Button";
 import Banner from "@/components/core/Banner";
+import SEO from "@/components/seo/SEO";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -72,6 +73,14 @@ export default function ContactPage() {
 
   return (
     <div className="">
+      <SEO
+        title="Contact Us"
+        description="Get in touch with Foodeez. We're here to help with questions about listings, partnerships, and support."
+        url={typeof window !== 'undefined' ? window.location.href : 'https://foodeez.ch/contact'}
+        canonical={typeof window !== 'undefined' ? window.location.href : undefined}
+        type="website"
+        breadcrumbs={[{ name: 'Home', url: 'https://foodeez.ch' }, { name: 'Contact', url: 'https://foodeez.ch/contact' }]}
+      />
       {/* Header */}
       <Banner
         desktopSrc="/images/banners/banner1.jpeg"

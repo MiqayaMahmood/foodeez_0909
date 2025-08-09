@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Minus, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import SEO from "@/components/seo/SEO";
 
 interface FaqItem {
   question: string;
@@ -169,6 +170,23 @@ export default function FaqPage() {
 
   return (
     <main className="py-16 px-2 md:px-0">
+      <SEO
+        title="Frequently Asked Questions"
+        description="Find answers about Foodeez: how it works, who can join, pricing, visibility, and support."
+        url={typeof window !== 'undefined' ? window.location.href : 'https://foodeez.ch/faq'}
+        canonical={typeof window !== 'undefined' ? window.location.href : undefined}
+        type="website"
+        breadcrumbs={[{ name: 'Home', url: 'https://foodeez.ch' }, { name: 'FAQ', url: 'https://foodeez.ch/faq' }]}
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqs.map((f) => ({
+            '@type': 'Question',
+            name: f.question,
+            acceptedAnswer: { '@type': 'Answer', text: f.answer },
+          })),
+        }}
+      />
       <div className="">
         <div className="text-center mb-14">
           <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4">Frequently Asked Questions</h1>

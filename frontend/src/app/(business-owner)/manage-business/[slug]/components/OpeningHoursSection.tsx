@@ -1,7 +1,7 @@
 // components/OpeningHours.tsx
 import { format } from "date-fns";
 import { Clock } from "lucide-react";
-import { OpeningHourDay } from "./fetchGooglePlaceDetails";
+import { OpeningHourDay } from "@/types/google-business";
 
 type OpeningHoursProps = {
   openingHours: OpeningHourDay[];

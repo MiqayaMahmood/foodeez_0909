@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import SEO from '@/components/seo/SEO';
 
 function AuthErrorContent() {
   const searchParams = useSearchParams();
@@ -80,12 +81,23 @@ function AuthErrorContent() {
 
 export default function AuthErrorPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    }>
-      <AuthErrorContent />
-    </Suspense>
+    <>
+      <SEO
+        title="Authentication error"
+        description="An authentication error occurred."
+        url="https://foodeez.ch/auth/error"
+        canonical="https://foodeez.ch/auth/error"
+        noindex
+        nofollow
+        type="website"
+      />
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      }>
+        <AuthErrorContent />
+      </Suspense>
+    </>
   );
-} 
+}

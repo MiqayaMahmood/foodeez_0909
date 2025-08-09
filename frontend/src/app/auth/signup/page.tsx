@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/core/Input";
 import { Button } from "@/components/core/Button";
 import { FcGoogle } from "react-icons/fc";
+import SEO from "@/components/seo/SEO";
 
 export default function SignUp() {
   const router = useRouter();
@@ -94,6 +95,15 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 py-12 px-4 sm:px-6 lg:px-8">
+      <SEO
+        title="Sign up"
+        description="Create your Foodeez account."
+        url="https://foodeez.ch/auth/signup"
+        canonical="https://foodeez.ch/auth/signup"
+        noindex
+        nofollow
+        type="website"
+      />
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl">
         <div className="text-center">
           <Link href="/" className="inline-block mb-8">

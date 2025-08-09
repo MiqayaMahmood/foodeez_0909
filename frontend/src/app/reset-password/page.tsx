@@ -6,6 +6,7 @@ import { Input } from '@/components/core/Input';
 import { Button } from '@/components/core/Button';
 import Image from 'next/image';
 import Link from 'next/link';
+import SEO from '@/components/seo/SEO';
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -189,12 +190,23 @@ function ResetPasswordContent() {
 
 export default function ResetPassword() {
   return (
-    <Suspense fallback={
+    <>
+      <SEO
+        title="Reset password"
+        description="Reset your Foodeez account password."
+        url="https://foodeez.ch/reset-password"
+        canonical="https://foodeez.ch/reset-password"
+        noindex
+        nofollow
+        type="website"
+      />
+      <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     }>
       <ResetPasswordContent />
     </Suspense>
+    </>
   );
-} 
+}

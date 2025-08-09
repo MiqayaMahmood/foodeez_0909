@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Input } from '@/components/core/Input';
 import { Button } from '@/components/core/Button';
 import Image from 'next/image';
+import SEO from '@/components/seo/SEO';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -44,6 +45,15 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 py-12 px-4 sm:px-6 lg:px-8">
+      <SEO
+        title="Forgot password"
+        description="Request a password reset link for your Foodeez account."
+        url="https://foodeez.ch/auth/forgot-password"
+        canonical="https://foodeez.ch/auth/forgot-password"
+        noindex
+        nofollow
+        type="website"
+      />
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl">
         <div className="text-center">
           <Link href="/" className="inline-block mb-8">

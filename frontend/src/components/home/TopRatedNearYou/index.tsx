@@ -107,6 +107,12 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
 
     // Check if location is already enabled on mount
     useEffect(() => {
+        if (userLocation?.lat && userLocation?.lng) {
+            fetchRestaurants(userLocation);
+        }
+    }, [userLocation, fetchRestaurants]);
+
+    useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -137,7 +143,7 @@ export default function TopRatedNearYou({ className = "" }: TopRatedNearYouProps
             // Try with default coordinates as fallback
             fetchRestaurants({ lat: 0, lng: 0 });
         }
-    }, [fetchRestaurants]);
+    }, [fetchRestaurants, userLocation]);
 
     // Don't render the component if no restaurants found
     if (!shouldRender) {

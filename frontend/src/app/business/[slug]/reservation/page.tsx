@@ -14,6 +14,8 @@ import ReservationSuccess from "./components/ReservationSuccess";
 import LoadingSkeleton from "./components/LoadingSkeleton";
 import Banner from "@/components/core/Banner";
 import { getBusinessById } from "@/services/BusinessProfilePageService";
+import SEO from "@/components/seo/SEO";
+import { buildBusinessBreadcrumbs } from "@/lib/seo";
 
 export default function ReservationPage() {
   const params = useParams();
@@ -140,20 +142,18 @@ export default function ReservationPage() {
 
   return (
     <>
-      <head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:image" content={image} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={url} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={image} />
-        <link rel="canonical" href={url} />
-      </head>
+      <SEO
+        title={title}
+        description={description}
+        image={image}
+        url={url}
+        canonical={url}
+        type="website"
+        breadcrumbs={buildBusinessBreadcrumbs('https://foodeez.ch', [
+          { name: 'Business', url: `https://foodeez.ch/business/${slug}/reservation` },
+          { name: 'Reservation', url },
+        ])}
+      />
       <div className="">
         <Banner
           desktopSrc="/images/banners/banner1.jpeg"

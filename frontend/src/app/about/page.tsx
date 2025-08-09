@@ -2,10 +2,19 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import SEO from '@/components/seo/SEO';
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white pt-20">
+      <SEO
+        title="About Foodeez"
+        description="Learn about Foodeez: a food discovery, visit, order & review portal connecting food lovers with local restaurants."
+        url={typeof window !== 'undefined' ? window.location.href : 'https://foodeez.ch/about'}
+        canonical={typeof window !== 'undefined' ? window.location.href : undefined}
+        type="website"
+        breadcrumbs={[{ name: 'Home', url: 'https://foodeez.ch' }, { name: 'About', url: 'https://foodeez.ch/about' }]}
+      />
       {/* Hero Section */}
       <section className="relative py-20 bg-primary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

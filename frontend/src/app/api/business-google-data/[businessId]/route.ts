@@ -8,6 +8,7 @@ import {
   GooglePhoto
 } from '@/types/google-business';
 import prisma from '@/lib/prisma';
+import { CheckisOpenNow } from '@/lib/isOpenNow';
 
 
 export async function GET(
@@ -23,9 +24,7 @@ export async function GET(
       } as BusinessGoogleDataResponse, { status: 400 });
     }
 
-    // Check for refresh parameter
-    const url = new URL(request.url);
-    const forceRefresh = url.searchParams.get('refresh') === 'true';
+    // Prefer DB always; only call API when DB has no data
 
     // Get PLACE_ID from DB
     const business = await prisma.business_detail_view_all.findUnique({
@@ -42,15 +41,14 @@ export async function GET(
 
     const placeId = business.PLACE_ID;
 
-    // Check DB for cached data (unless force refresh)
-    if (!forceRefresh) {
-      const cachedData = await getCachedBusinessData(businessId, placeId);
-      if (cachedData) {
-        return NextResponse.json({
-          ...cachedData,
-          success: true
-        } as BusinessGoogleDataResponse);
-      }
+    // Check DB for data first
+    const cachedData = await getCachedBusinessData(businessId, placeId);
+    if (cachedData) {
+      return NextResponse.json({
+        ...cachedData,
+        success: true,
+        dataSource: 'db'
+      } as BusinessGoogleDataResponse as any);
     }
 
     // Fetch fresh data from Google API
@@ -63,8 +61,9 @@ export async function GET(
 
     return NextResponse.json({
       ...freshData,
-      success: true
-    } as BusinessGoogleDataResponse);
+      success: true,
+      dataSource: 'api'
+    } as BusinessGoogleDataResponse as any);
 
   } catch (error) {
     console.error('Error in GET /business-google-data:', error);
@@ -121,9 +120,9 @@ async function getCachedBusinessData(
 
     // Get the most recent creation date for lastUpdated
     const timestamps = [
-      ...cachedReviews.map(r => new Date().getTime()), // Fallback since view might not have CREATION_DATETIME
-      ...cachedOpeningHours.map(h => new Date().getTime()),
-      ...cachedPhotos.map(p => new Date().getTime())
+      ...cachedReviews.map(() => new Date().getTime()), // Fallback since view might not have CREATION_DATETIME
+      ...cachedOpeningHours.map(() => new Date().getTime()),
+      ...cachedPhotos.map(() => new Date().getTime())
     ];
     const lastUpdated = new Date(Math.max(...timestamps));
 
@@ -134,7 +133,7 @@ async function getCachedBusinessData(
       reviews,
       openingHours,
       photos,
-      isOpenNow: false, // We don't cache this real-time data
+      isOpenNow : CheckisOpenNow(openingHours),
       cached: true,
       lastUpdated
     };
@@ -153,24 +152,22 @@ async function saveBusinessDataToDb(
   placeId: string, 
   data: BusinessGoogleData
 ): Promise<void> {
-  console.log(`Starting to save data for business ${businessId}, place ${placeId}`);
-  console.log(`Data to save: ${data.reviews.length} reviews, ${data.openingHours.length} hours, ${data.photos.length} photos`);
   try {
-    // Clear existing data first
-    console.log('Clearing existing data...');
-    const deleteResults = await Promise.all([
-      prisma.business_google_reviews.deleteMany({ where: { BUSINESS_ID: businessId } }),
-      prisma.business_opening_hours.deleteMany({ where: { BUSINESS_ID: businessId } }),
-      prisma.business_google_images.deleteMany({ where: { BUSINESS_ID: businessId } })
+    // Guard: if any data already exists for this business/place, skip saving to avoid duplicates
+    const [existingReviews, existingHours, existingPhotos] = await Promise.all([
+      prisma.business_google_reviews.count({ where: { BUSINESS_ID: businessId, PLACE_ID: placeId } }),
+      prisma.business_opening_hours.count({ where: { BUSINESS_ID: businessId, PLACE_ID: placeId } }),
+      prisma.business_google_images.count({ where: { BUSINESS_ID: businessId, PLACE_ID: placeId } })
     ]);
-    console.log('Deleted:', deleteResults);
+    if (existingReviews > 0 || existingHours > 0 || existingPhotos > 0) {
+      return;
+    }
 
     // Save reviews
-    console.log('Saving reviews...');
     for (let i = 0; i < data.reviews.length; i++) {
       const review = data.reviews[i];
       try {
-        const result = await prisma.business_google_reviews.create({
+        await prisma.business_google_reviews.create({
           data: {
             BUSINESS_ID: businessId,
             PLACE_ID: placeId,
@@ -182,7 +179,6 @@ async function saveBusinessDataToDb(
             PROFILE_PHOTO_URL: review.profile_photo_url,
           }
         });
-        console.log(`Saved review ${i + 1}:`, result.BUSINESS_GOOGLE_REVIEWS_ID);
       } catch (err) {
         console.error(`Error saving review ${i + 1}:`, err);
         console.error('Review data:', review);
@@ -190,7 +186,6 @@ async function saveBusinessDataToDb(
     }
 
     // Save opening hours using direct SQL to avoid Prisma issues
-    console.log('Saving opening hours...');
     for (let i = 0; i < data.openingHours.length; i++) {
       const hours = data.openingHours[i];
       try {
@@ -198,11 +193,10 @@ async function saveBusinessDataToDb(
         const [open1, close1] = timeRanges[0]?.split(/[-–]/).map(t => t.trim()) || ['', ''];
         const [open2, close2] = timeRanges[1]?.split(/[-–]/).map(t => t.trim()) || ['', ''];
         
-        const result = await prisma.$executeRaw`
+        await prisma.$executeRaw`
           INSERT INTO business_opening_hours (CREATION_DATETIME, BUSINESS_ID, PLACE_ID, DAY, OPEN_1, CLOSE_1, OPEN_2, CLOSE_2, REMARKS)
           VALUES (NOW(), ${businessId}, ${placeId}, ${hours.day}, ${open1}, ${close1}, ${open2}, ${close2}, ${hours.hours})
         `;
-        console.log(`Saved opening hours ${i + 1}:`, result);
       } catch (err) {
         console.error(`Error saving opening hours ${i + 1}:`, err);
         console.error('Hours data:', hours);
@@ -210,22 +204,18 @@ async function saveBusinessDataToDb(
     }
 
     // Save photos using direct SQL
-    console.log('Saving photos...');
     for (let i = 0; i < data.photos.length; i++) {
       const photo = data.photos[i];
       try {
-        const result = await prisma.$executeRaw`
+        await prisma.$executeRaw`
           INSERT INTO business_google_images (CREATION_DATETIME, BUSINESS_ID, PLACE_ID, IMAGE_URL, WIDTH, HEIGHT)
           VALUES (NOW(), ${businessId}, ${placeId}, ${photo.photoUrl}, ${String(photo.width)}, ${String(photo.height)})
         `;
-        console.log(`Saved photo ${i + 1}:`, result);
       } catch (err) {
         console.error(`Error saving photo ${i + 1}:`, err);
         console.error('Photo data:', photo);
       }
     }
-    
-    console.log('Successfully completed saving all data to database');
   } catch (error) {
     console.error('Critical error saving business data to database:', error);
     // Don't throw error to prevent API from failing if DB save fails

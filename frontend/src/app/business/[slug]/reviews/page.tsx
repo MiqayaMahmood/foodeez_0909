@@ -21,6 +21,8 @@ import FoodeezReviewCard from "@/components/core/review/FoodeezReviewCard";
 import ReviewForm from "@/components/core/review/ReviewForm";
 import LoginRequiredModal from "@/components/core/LoginRequiredModal";
 import EditReviewModal from "@/components/core/review/EditReviewModal";
+import SEO from "@/components/seo/SEO";
+import { buildBusinessBreadcrumbs } from "@/lib/seo";
 
 export default function AllFoodeezReviewsPage() {
   const { data: session } = useSession();
@@ -101,6 +103,17 @@ export default function AllFoodeezReviewsPage() {
 
   return (
     <div className="">
+      <SEO
+        title={`${business?.BUSINESS_NAME || 'Business'} Reviews | Foodeez`}
+        description={`Read customer reviews for ${business?.BUSINESS_NAME || 'this restaurant'} on Foodeez.`}
+        url={typeof window !== 'undefined' ? window.location.href : ''}
+        canonical={typeof window !== 'undefined' ? window.location.href : undefined}
+        type="website"
+        breadcrumbs={buildBusinessBreadcrumbs('https://foodeez.ch', [
+          { name: 'Business', url: business ? `https://foodeez.ch/business/${business.BUSINESS_ID}/reviews` : 'https://foodeez.ch' },
+          { name: 'Reviews', url: typeof window !== 'undefined' ? window.location.href : '' },
+        ])}
+      />
       <Banner
         desktopSrc="/images/banners/banner1.jpeg"
         mobileSrc="/images/bannerForMobile/banner1.jpeg"
