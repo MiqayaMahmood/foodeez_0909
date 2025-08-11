@@ -67,13 +67,6 @@ const FoodJourneyDetailPage = () => {
 
   return (
     <>
-      <head>
-        <title>{story.TITLE ? `${story.TITLE} | Food Journey` : 'Food Journey Story'}</title>
-        <meta name="description" content={story.DESCRIPTION?.slice(0, 150) || 'Read this amazing food journey story on Foodeez!'} />
-        <meta property="og:title" content={story.TITLE} />
-        <meta property="og:description" content={story.DESCRIPTION?.slice(0, 150)} />
-        {images[0] && <meta property="og:image" content={images[0]} />}
-      </head>
       <div className="max-w-5xl mx-auto px-4 py-10">
         {/* Title */}
         <h1 className="text-3xl md:text-5xl font-extrabold text-primary mb-6 text-center break-words">

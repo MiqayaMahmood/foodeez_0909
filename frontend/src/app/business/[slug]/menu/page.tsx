@@ -15,8 +15,7 @@ import MenuHeroSection from "@/components/menu/MenuHeroSection";
 import MenuCategorySection from "@/components/menu/MenuCategorySection";
 import MenuSwitchSkeleton from "@/components/menu/MenuSwitchSkeleton";
 import MenuLoadingSkeleton from "@/components/menu/MenuLoadingSkeleton";
-import SEO from "@/components/seo/SEO";
-import { buildBusinessBreadcrumbs } from "@/lib/seo";
+
 
 export default function MenuPage() {
   const params = useParams();
@@ -96,29 +95,8 @@ export default function MenuPage() {
       </div>
     );
 
-  // Meta tags (example, you can expand as needed)
-  const businessName = business.BUSINESS_NAME || "Business";
-  const title = `Menu at ${businessName} | Foodeez`;
-  const description = business.DESCRIPTION
-    ? `Explore the menu at ${businessName} on Foodeez. ${business.DESCRIPTION}`
-    : `Explore the menu at ${businessName} on Foodeez.`;
-  const image = business.LOGO || "/reservation-default.jpg";
-  const url = typeof window !== "undefined" ? window.location.href : "";
-
   return (
     <>
-      <SEO
-        title={title}
-        description={description}
-        image={image}
-        url={url}
-        canonical={url}
-        type="website"
-        breadcrumbs={buildBusinessBreadcrumbs('https://foodeez.ch', [
-          { name: 'Business', url: `https://foodeez.ch/business/${slug}/menu` },
-          { name: 'Menu', url },
-        ])}
-      />
       <div className="px-4 lg:px-0">
         <MenuHeroSection
           business={business}

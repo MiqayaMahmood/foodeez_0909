@@ -1,5 +1,89 @@
+import { Metadata } from 'next';
 import { BusinessGoogleData } from '@/types/google-business';
 import { business_detail_view_all } from '@prisma/client';
+
+// --- NEW --- //
+interface PageSEOProps {
+  title: string;
+  description: string;
+  keywords?: string | string[];
+  image?: string;
+  url: string; // Page's canonical URL
+  noindex?: boolean;
+  nofollow?: boolean;
+  breadcrumbs?: { name: string; url: string }[];
+  structuredData?: Record<string, any> | Record<string, any>[];
+}
+
+/**
+ * Generates a Next.js Metadata object for a page.
+ * This is the modern replacement for the old SEO component.
+ */
+export function generatePageMetadata({
+  title,
+  description,
+  keywords = ["food", "restaurants", "discovery", "reviews", "dining", "cuisine"],
+  image = "/images/og-default.jpg",
+  url,
+  noindex = false,
+  nofollow = false,
+  breadcrumbs,
+  structuredData,
+}: PageSEOProps): Metadata {
+  const fullImageUrl = image.startsWith('http') ? image : `https://foodeez.ch${image}`;
+
+  // Combine all structured data into a single array
+  const allStructuredData = [];
+  if (breadcrumbs && breadcrumbs.length > 0) {
+    allStructuredData.push({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbs.map((bc, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: bc.name,
+        item: bc.url,
+      })),
+    });
+  }
+
+  if (structuredData) {
+    if (Array.isArray(structuredData)) {
+      allStructuredData.push(...structuredData);
+    } else {
+      allStructuredData.push(structuredData);
+    }
+  }
+
+  const metadata: Metadata = {
+    title, // This will be combined with the template in the root layout
+    description,
+    keywords,
+    alternates: {
+      canonical: url,
+    },
+    robots: {
+      index: !noindex,
+      follow: !nofollow,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      images: [fullImageUrl],
+    },
+    // Inject structured data using a script in the 'other' property
+    ...(allStructuredData.length > 0 && {
+      other: {
+        'script[type="application/ld+json"]': JSON.stringify(allStructuredData),
+      },
+    }),
+  };
+
+  return metadata;
+}
+// --- END NEW --- //
+
 
 // Build LocalBusiness/Restaurant structured data from DB + Google data
 export function buildLocalBusinessSchema(

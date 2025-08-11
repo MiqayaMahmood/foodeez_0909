@@ -14,8 +14,7 @@ import ReservationSuccess from "./components/ReservationSuccess";
 import LoadingSkeleton from "./components/LoadingSkeleton";
 import Banner from "@/components/core/Banner";
 import { getBusinessById } from "@/services/BusinessProfilePageService";
-import SEO from "@/components/seo/SEO";
-import { buildBusinessBreadcrumbs } from "@/lib/seo";
+
 
 export default function ReservationPage() {
   const params = useParams();
@@ -115,16 +114,6 @@ export default function ReservationPage() {
     );
   }
 
-  // Meta data
-  const title = business.BUSINESS_NAME
-    ? `Reserve a Table at ${business.BUSINESS_NAME} | Foodeez`
-    : "Reserve a Table | Foodeez";
-  const description = business.DESCRIPTION
-    ? `Reserve your table at ${business.BUSINESS_NAME} on Foodeez. ${business.DESCRIPTION}`
-    : `Reserve your table at ${business.BUSINESS_NAME} on Foodeez.`;
-  const image = business.IMAGE_URL || "/reservation-default.jpg";
-  const url = typeof window !== "undefined" ? window.location.href : "";
-
   if (isSuccess) {
     return (
       <div className="px-4 lg:px-0 py-12">
@@ -142,18 +131,6 @@ export default function ReservationPage() {
 
   return (
     <>
-      <SEO
-        title={title}
-        description={description}
-        image={image}
-        url={url}
-        canonical={url}
-        type="website"
-        breadcrumbs={buildBusinessBreadcrumbs('https://foodeez.ch', [
-          { name: 'Business', url: `https://foodeez.ch/business/${slug}/reservation` },
-          { name: 'Reservation', url },
-        ])}
-      />
       <div className="">
         <Banner
           desktopSrc="/images/banners/banner1.jpeg"
