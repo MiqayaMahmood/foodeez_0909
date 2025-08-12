@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import AddToCartButton from "../core/AddToCartButton";
+import { MenuProduct } from "@/types/product";
 
 interface MenuProductCardProps {
-  product: any;
+  product: MenuProduct;
 }
 
 export default function MenuProductCard({ product }: MenuProductCardProps) {
-  const isSoldOut = product.STATUS === 0;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col overflow-hidden transition hover:shadow-md h-full">
@@ -56,11 +57,14 @@ export default function MenuProductCard({ product }: MenuProductCardProps) {
 
         {/* Footer */}
         <div className="mt-auto">
-          {isSoldOut && (
-            <span className="inline-block bg-gray-300 text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
-              Sold Out
-            </span>
-          )}
+          <AddToCartButton
+            product={{
+              id: String(product.BUSINESS_PRODUCT_ID),
+              name: product.PRODUCT_NAME,
+              price: Number(product.PRODUCT_PRICE),
+              image: product.PIC,
+            }}
+          />
         </div>
       </div>
     </div>

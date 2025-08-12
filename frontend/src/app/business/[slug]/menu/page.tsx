@@ -7,10 +7,8 @@ import {
   getBusinessMenuOnly,
   getBusinessMenuWithProducts,
 } from "@/services/MenuPageService";
-import {
-  business_food_menu_card_view,
-  business_food_menu_card_detail_view,
-} from "@prisma/client";
+import { business_food_menu_card_view } from "@prisma/client";
+import { MenuProduct } from "@/types/product";
 import MenuHeroSection from "@/components/menu/MenuHeroSection";
 import MenuCategorySection from "@/components/menu/MenuCategorySection";
 import MenuSwitchSkeleton from "@/components/menu/MenuSwitchSkeleton";
@@ -25,9 +23,7 @@ export default function MenuPage() {
   const [business, setBusiness] = useState<business_food_menu_card_view | null>(
     null
   );
-  const [menuData, setMenuData] = useState<
-    business_food_menu_card_detail_view[]
-  >([]);
+  const [menuData, setMenuData] = useState<MenuProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMenuId, setSelectedMenuId] = useState<number | null>(null);
   const [switchingMenu, setSwitchingMenu] = useState(false);
@@ -50,7 +46,7 @@ export default function MenuPage() {
 
   // Group by menu card
   const menuCardsMap = useMemo(() => {
-    const map = new Map<number, business_food_menu_card_detail_view[]>();
+    const map = new Map<number, MenuProduct[]>();
     menuData.forEach((item) => {
       if (!map.has(item.BUSINESS_FOOD_MENU_CARD_ID)) {
         map.set(item.BUSINESS_FOOD_MENU_CARD_ID, []);
@@ -71,7 +67,7 @@ export default function MenuPage() {
   }, [selectedMenuId, menuCardsMap]);
 
   // Group selected menu's products by category
-  const menuByCategory: Record<string, business_food_menu_card_detail_view[]> =
+  const menuByCategory: Record<string, MenuProduct[]> =
     useMemo(() => {
       return (selectedMenuProducts ?? []).reduce(
         (acc, item) => {
@@ -80,7 +76,7 @@ export default function MenuPage() {
           acc[cat].push(item);
           return acc;
         },
-        {} as Record<string, business_food_menu_card_detail_view[]>
+        {} as Record<string, MenuProduct[]>
       );
     }, [selectedMenuProducts]);
 

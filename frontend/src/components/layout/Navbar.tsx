@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import ProfileDropdown from "./ProfileDropdown";
 import MobileMenu from "../ui/MobileMenu";
+import CartIcon from "../cart/CartIcon";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -90,6 +91,7 @@ export const Navbar = () => {
               {link.label}
             </Link>
           ))}
+          <CartIcon />
           <div className="ml-6">
             {status === "loading" ? (
               <AuthSkeleton />
@@ -116,6 +118,7 @@ export const Navbar = () => {
 
         {/* Mobile Hamburger */}
         <div className="lg:hidden flex items-center">
+          <CartIcon />
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}

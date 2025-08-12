@@ -1,9 +1,10 @@
 "use client";
 
+import { MenuProduct } from "@/types/product";
 import MenuProductCard from "./MenuProductCard";
 
 interface MenuProductCardGridProps {
-  products: any[];
+  products: MenuProduct[];
 }
 
 export default function MenuProductCardGrid({ products }: MenuProductCardGridProps) {
