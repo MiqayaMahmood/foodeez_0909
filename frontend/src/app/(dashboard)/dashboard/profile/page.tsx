@@ -13,6 +13,7 @@ import {
   Pencil,
   CheckCircle2,
   XCircle,
+  Package,
 } from "lucide-react";
 import Image from "next/image";
 import ImageUploadModal from "@/components/ui/ImageUploadModal";
@@ -25,6 +26,8 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState("");
   const [activeTab, setActiveTab] = useState("general");
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  
+
   const [formData, setFormData] = useState({
     firstName: session?.user?.name?.split(" ")[0] || "",
     lastName: session?.user?.name?.split(" ")[1] || "",
@@ -41,6 +44,8 @@ export default function ProfilePage() {
     },
   });
 
+
+
   useEffect(() => {
     if (session?.user) {
       setFormData((prev) => ({
@@ -51,6 +56,8 @@ export default function ProfilePage() {
       }));
     }
   }, [session]);
+
+
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -324,6 +331,8 @@ export default function ProfilePage() {
                 />
               </motion.div>
             )}
+
+
 
             <div className="pt-6 border-t border-gray-200">
               <Button

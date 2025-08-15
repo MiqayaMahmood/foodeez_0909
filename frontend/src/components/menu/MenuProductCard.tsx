@@ -11,7 +11,7 @@ interface MenuProductCardProps {
 export default function MenuProductCard({ product }: MenuProductCardProps) {
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col overflow-hidden transition hover:shadow-md h-full">
+    <div className="bg-white rounded-2xl border-2 border-primary shadow-md flex flex-col overflow-hidden transition hover:shadow-xl h-full">
       {/* Image Container */}
       <div className="relative w-full h-[220px] bg-gray-50">
         {product.PIC ? (

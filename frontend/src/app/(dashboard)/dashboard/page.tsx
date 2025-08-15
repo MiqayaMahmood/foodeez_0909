@@ -11,6 +11,7 @@ import {
   Star,
   Bookmark,
   LinkIcon,
+  Package,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,8 +19,16 @@ import Image from "next/image";
 export default function DashboardPage() {
   const { data: session } = useSession();
 
-  // Placeholder quick actions
+  // Orders have been moved to /dashboard/orders
+
+  // Quick actions
   const quickActions = [
+    {
+      title: "My Orders",
+      description: "View your order history",
+      icon: Package,
+      href: "/dashboard/orders",
+    },
     {
       title: "Update Profile",
       description: "Keep your information current",
@@ -31,21 +40,14 @@ export default function DashboardPage() {
       description: "Your favorite restaurants",
       icon: Heart,
       href: "/dashboard/favorites",
-      isComingSoon: true, // Marked as coming soon
-    },
-    {
-      title: "Followers",
-      description: "People who follow you",
-      icon: Users,
-      href: "/dashboard/followers",
-      isComingSoon: true, // Marked as coming soon
+      isComingSoon: true,
     },
     {
       title: "Following",
       description: "Restaurants & users you follow",
       icon: UserPlus,
       href: "/dashboard/following",
-      isComingSoon: true, // Marked as coming soon
+      isComingSoon: true,
     },
   ];
 
@@ -57,13 +59,13 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="mx-auto px-4 lg:px-0 py-8 space-y-10"> {/* max-w-5xl removed */}
+    <div className="mx-auto px-4 lg:px-0 py-8 space-y-10">
       {/* Profile Card */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-gradient-to-br from-primary/90 to-primary/60 p-8 rounded-3xl shadow-xl text-white flex flex-col md:flex-row items-center gap-8"
+        className="bg-primary p-8 rounded-3xl shadow-xl text-white flex flex-col md:flex-row items-center gap-8"
       >
         <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden shadow-lg border-4">
           {session?.user?.image ? (
@@ -110,7 +112,7 @@ export default function DashboardPage() {
         transition={{ delay: 0.2 }}
         className="bg-white rounded-3xl shadow-lg p-8"
       >
-        <h2 className="text-2xl font-bold mb-6 text-primary">Quick Actions</h2>
+        <h2 className="sub-heading">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickActions.map((action, index) => (
             <motion.div

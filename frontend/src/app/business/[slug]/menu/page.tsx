@@ -93,7 +93,7 @@ export default function MenuPage() {
 
   return (
     <>
-      <div className="px-4 lg:px-0">
+      <div className="px-0">
         <MenuHeroSection
           business={business}
           Menu={menuCardList}
@@ -106,7 +106,8 @@ export default function MenuPage() {
           }}
           selectedMenuId={selectedMenuId}
         />
-        {menuCardList.length === 0 ? (
+       <div className="px-4 lg:px-0">
+       {menuCardList.length === 0 ? (
           <div className="text-center py-20 text-white/90 bg-primary/10">
             <div className="text-5xl mb-4">🍽️</div>
             <h2 className="sub-heading text-center mb-2">
@@ -134,6 +135,7 @@ export default function MenuPage() {
             )
           )
         )}
+       </div>
       </div>
     </>
   );
