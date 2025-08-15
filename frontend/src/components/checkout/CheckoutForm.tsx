@@ -20,7 +20,7 @@ type CheckoutFormData = {
 
 export default function CheckoutForm() {
   const { data: session } = useSession();
-  const { items, totalPrice, clearCart } = useCartStore();
+  const { items } = useCartStore();
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 

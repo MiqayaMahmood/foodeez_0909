@@ -13,7 +13,6 @@ import {
   Pencil,
   CheckCircle2,
   XCircle,
-  Package,
 } from "lucide-react";
 import Image from "next/image";
 import ImageUploadModal from "@/components/ui/ImageUploadModal";

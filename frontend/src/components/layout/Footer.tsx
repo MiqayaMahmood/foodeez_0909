@@ -118,16 +118,16 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-5">Quick Links</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="#">Search Restaurant</Link>
+                <Link href="/faq">FAQs</Link>
               </li>
               <li>
-                <Link href="#">Blogs</Link>
+                <Link href="/contact">Contact Us</Link>
               </li>
               <li>
-                <Link href="#">Help us to serve better</Link>
+                <Link href="/food-journey">Share your food journey</Link>
               </li>
               <li>
-                <Link href="#">Be a Foodeez Explorer</Link>
+                <Link href="/">Be a Foodeez Explorer</Link>
               </li>
             </ul>
           </div>

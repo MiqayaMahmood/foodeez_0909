@@ -43,8 +43,8 @@ const mobileBanners = [
 ];
 
 const HeroSection = () => {
-  const [desktopRef, desktopApi] = useEmblaCarousel({ loop: true }, [Autoplay()]);
-  const [mobileRef, mobileApi] = useEmblaCarousel({ loop: true }, [Autoplay()]);
+  const [desktopRef, desktopApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000 })]);
+  const [mobileRef, mobileApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000 })]);
 
   const scrollPrev = useCallback((api: any) => api?.scrollPrev(), []);
   const scrollNext = useCallback((api: any) => api?.scrollNext(), []);

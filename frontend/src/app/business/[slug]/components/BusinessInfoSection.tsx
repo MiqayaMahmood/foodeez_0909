@@ -3,6 +3,7 @@ import { MapPin, Phone, Globe } from "lucide-react";
 import Link from "next/link";
 import FoodTypeBadges from "@/components/core/FoodTypeBadges";
 import { business_detail_view_all } from "@prisma/client";
+import Separator from "@/components/ui/separator";
 
 const BusinessInfoSection: React.FC<{ business: business_detail_view_all, genSlug: string }> = ({
   business,
@@ -13,7 +14,7 @@ const BusinessInfoSection: React.FC<{ business: business_detail_view_all, genSlu
     <div className="py-8 px-4 lg:px-0 space-y-8 lg:space-y-4">
       {/* Description Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="sub-heading">Description</h2>
+        <h2 className="sub-heading mb-8">Description</h2>
 
         <FoodTypeBadges
           HALAL={business.HALAL || 0}
@@ -25,9 +26,10 @@ const BusinessInfoSection: React.FC<{ business: business_detail_view_all, genSlu
       <p className="sub-heading-description mt-3 text-start text-text-main max-w-none">
         {business.DESCRIPTION}
       </p>
-
+      <Separator />
       {/* Address & Contact */}
       <div className="space-y-4">
+        <h2 className="sub-heading my-8">Address & Contact</h2>
         <div className="flex items-start gap-4">
           <MapPin className="text-primary mt-1 h-5 w-5" />
           <div className="space-y-1">
@@ -59,9 +61,9 @@ const BusinessInfoSection: React.FC<{ business: business_detail_view_all, genSlu
           </div>
         </div>
       </div>
-
+      <Separator />
       {/* Social & Reserve */}
-      <div className="flex flex-col md:flex-row gap-10 justify-between border-t pt-8">
+      <div className="flex flex-col md:flex-row gap-10 justify-between pt-8">
         <div className="flex items-center gap-2">
           {business.EMAIL_ADDRESS ? (
             <Link href={`/business/${genSlug}/reservation`} target="_blank">
@@ -84,7 +86,7 @@ const BusinessInfoSection: React.FC<{ business: business_detail_view_all, genSlu
               className="btn-primary opacity-50 cursor-not-allowed"
               disabled
             >
-              See Menu
+              Menu info not available
             </button>
           )}
         </div>

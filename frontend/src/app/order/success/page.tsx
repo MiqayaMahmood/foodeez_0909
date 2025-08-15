@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState, Suspense } from 'react';
+import {  useCallback,  useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useCartStore } from '@/stores/cartStore';
 import Link from 'next/link';
 import { CheckCircle, AlertTriangle, Clock, MapPin, Package, Home } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 
 interface OrderDetails {
@@ -37,14 +36,12 @@ interface OrderDetails {
 function SuccessPageContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
-  const { data: session } = useSession();
   const { clearCart } = useCartStore();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
   const [order, setOrder] = useState<OrderDetails | null>(null);
 
-  const verifyOrder = async () => {
+  const verifyOrder = useCallback(async () => {
     if (!sessionId) {
       setError('No session ID found. Please check your order status in your profile.');
       setStatus('error');
@@ -103,11 +100,11 @@ function SuccessPageContent() {
       setStatus('error');
       setError(err instanceof Error ? err.message : 'Failed to process your order. Please contact support.');
     }
-  };
+  }, [sessionId, clearCart, setOrder, setStatus, setError]);
 
   useEffect(() => {
     verifyOrder();
-  }, [sessionId, retryCount]);
+  }, [sessionId , verifyOrder]);
 
   function getEstimatedDeliveryDate() {
     const date = new Date();

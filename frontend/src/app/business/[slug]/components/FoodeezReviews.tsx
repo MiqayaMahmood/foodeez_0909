@@ -176,8 +176,8 @@ export default function FoodeezReviews({
           onScroll={checkScrollPosition}
         >
           {displayedReviews.length === 0 ? (
-            <p className="w-full  h-40 flex items-center justify-center text-text-main text-base">
-              No reviews found.
+            <p className="w-full h-40 flex lg:text-2xl items-center justify-center text-text-main text-base">
+              Be the first to write Review.
             </p>
           ) : (
             displayedReviews.map((review) => (

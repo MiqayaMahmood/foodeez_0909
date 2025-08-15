@@ -9,6 +9,7 @@ import FoodJourneyGrid from "@/components/core/food-journey/FoodJourneyGrid";
 import FoodJourneyPagination from "@/components/core/food-journey/FoodJourneyPagination";
 import FoodJourneyGridSkeleton from "@/components/core/food-journey/FoodJourneyGridSkeleton";
 import { visitor_food_journey_view } from "@prisma/client";
+import Separator from "@/components/ui/separator";
 
 const initialForm = {
   TITLE: "",
@@ -230,7 +231,7 @@ export default function FoodJourneyPage({ searchParams }: { searchParams: { [key
 
   return (
     <div className="px-4 lg:px-0 py-12">
-      <h1 className="main-heading text-center mb-10" id="stories">
+      <h1 className="sub-heading text-center mb-10" id="stories">
         Food Journey Stories
       </h1>
       {allStories.length === 0 && !submitting ? (
@@ -248,7 +249,8 @@ export default function FoodJourneyPage({ searchParams }: { searchParams: { [key
           )}
         </>
       )}
-      <h2 className="main-heading text-center my-20" id="shareFoodJourneyStory">
+      <Separator />
+      <h2 className="sub-heading text-center my-20" id="shareFoodJourneyStory">
         Share Your Food Journey
       </h2>
       <FoodJourneyForm

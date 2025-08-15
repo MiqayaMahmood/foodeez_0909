@@ -21,7 +21,7 @@ export default function UpcomingEvents() {
           .map((_, index) => ({
             TOP_EVENTS_ID: -1 - index,
             TITLE: "Coming Soon",
-            ADDRESS: "Richtiplatz 3, 8304 Wallisellen (Zürich)",
+            ADDRESS: "Foodeez.ch, 8154 Oberglatt, Switzerland",
             DATE_1: new Date(
               new Date().setMonth(new Date().getMonth() + 1 + index)
             ),
@@ -50,7 +50,7 @@ export default function UpcomingEvents() {
           .map((_, index) => ({
             TOP_EVENTS_ID: -1 - index,
             TITLE: "Coming Soon",
-            ADDRESS: "Richtiplatz 3, 8304 Wallisellen (Zürich)",
+            ADDRESS: "Foodeez.ch, 8154 Oberglatt, Switzerland",
             DATE_1: new Date(
               new Date().setMonth(new Date().getMonth() + 1 + index)
             ),

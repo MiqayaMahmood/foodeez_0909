@@ -12,7 +12,7 @@ const TopRatedNearYou = dynamic(() => import('@/components/home/TopRatedNearYou'
 const MapSection = dynamic(() => import('@/components/home/MapSection'));
 const GoogleMapsProvider = dynamic(() => import('@/components/providers/GoogleMapsProvider'));
 const AdsBar1 = dynamic(() => import('@/components/home/AdsBar1'));
-const AdsBar2 = dynamic(() => import('@/components/home/AdsBar2'));
+// const AdsBar2 = dynamic(() => import('@/components/home/AdsBar2'));
 const TestimonialsSection = dynamic(() => import('@/components/home/FoodeezTestimonials/TestimonialsSection'));
 const Separator = dynamic(() => import('@/components/ui/separator'));
 const CommunitySection = dynamic(() => import('@/components/home/CommunitySection'));
@@ -34,7 +34,8 @@ export default function Home() {
         {/* Hero Section */}
         <AdsBar1 />
         <HeroSection />
-        <AdsBar2 />
+        <AdsBar1 />
+        {/* <AdsBar2 /> */}
         <Separator />
 
         {/* Top Rated Restaurants Near You */}

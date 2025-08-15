@@ -33,7 +33,7 @@ const ReviewsGrid: React.FC<ReviewsGridProps> = ({
         {[...Array(6)].map((_, index) => (
           <div
             key={index}
-            className="h-[340px] w-80 bg-gray-200 rounded-2xl animate-pulse flex-shrink-0"
+            className="h-[340px] w-[272px] bg-gray-200 rounded-2xl animate-pulse flex-shrink-0"
           />
         ))}
       </div>
@@ -82,7 +82,7 @@ const ReviewsGrid: React.FC<ReviewsGridProps> = ({
                 type: "spring",
                 stiffness: 100,
               }}
-              className="w-80 flex-shrink-0"
+              className="w-[272px] flex-shrink-0"
             >
               <ReviewCard
                 review={review}

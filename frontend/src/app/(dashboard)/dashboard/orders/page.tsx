@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Package, XCircle } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function OrdersPage() {
   const { data: session } = useSession();
@@ -146,9 +147,11 @@ export default function OrdersPage() {
                     <div key={idx} className="flex items-start py-4 border-b border-gray-100 last:border-0 gap-4">
                       <div className="flex-shrink-0 h-16 w-16 rounded-md overflow-hidden bg-gray-100">
                         {item.product?.PRODUCT_IMAGE ? (
-                          <img
+                          <Image
                             src={item.product.PRODUCT_IMAGE}
                             alt={item.product.PRODUCT_NAME}
+                            width={64}
+                            height={64}
                             className="h-full w-full object-cover object-center"
                           />
                         ) : (

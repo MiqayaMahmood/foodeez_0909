@@ -71,7 +71,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full h-[340px]"
+      className="w-[272px] h-[340px]"
     >
       <Card className="h-full rounded-2xl border-2 border-gray-100 bg-background-card p-4 lg:p-6 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col">
         {/* Header */}
