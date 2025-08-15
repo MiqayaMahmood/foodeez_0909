@@ -10,6 +10,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -30,6 +31,21 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // Check if we already processed this session to prevent duplicates
+    const existingOrder = await prisma.business_order.findFirst({
+      where: {
+        PAYMENT_MODE: 'stripe',
+        // Use a combination of session metadata to identify duplicates
+        EMAIL_ADDRESS: { not: null },
+        CREATION_DATETIME: {
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
+        }
+      },
+      orderBy: {
+        CREATION_DATETIME: 'desc'
+      }
+    });
+
     // Retrieve the session with expanded line items and customer details
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['line_items.data.price.product', 'customer', 'payment_intent'],
@@ -37,6 +53,56 @@ export async function GET(req: NextRequest) {
 
     if (session.payment_status !== 'paid') {
       return NextResponse.json({ success: false, error: 'Payment not successful.' }, { status: 402 });
+    }
+
+    // Check if this exact session was already processed
+    if (existingOrder && 
+        existingOrder.EMAIL_ADDRESS === (session.customer_email || session.metadata?.customerEmail) &&
+        Math.abs(Number(existingOrder.ORDER_AMOUNT) - Number(session.amount_total || 0) / 100) < 0.01) {
+      
+      // Get line items with expanded product details
+      const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, {
+        expand: ['data.price.product']
+      });
+
+      // Format items with complete product data
+      const items = lineItems.data.map(item => ({
+        id: item.id,
+        price: {
+          id: item.price?.id,
+          product: item.price?.product,
+          unit_amount: item.price?.unit_amount,
+          currency: item.price?.currency,
+        },
+        quantity: item.quantity,
+        description: item.description,
+        amount_subtotal: item.amount_subtotal,
+        amount_total: item.amount_total,
+        // Include any other relevant fields
+      }));
+      
+      // Return the existing order with complete product data
+      return NextResponse.json({ 
+        success: true, 
+        orderId: existingOrder.BUSINESS_ORDER_ID,
+        orderNumber: `ORD-${existingOrder.BUSINESS_ORDER_ID}`,
+        customerId: existingOrder.VISITOR_ID || undefined,
+        customerName: `${existingOrder.FIRST_NAME} ${existingOrder.LAST_NAME}`,
+        customerEmail: existingOrder.EMAIL_ADDRESS || '',
+        items,
+        amount_subtotal: Number(existingOrder.ORDER_AMOUNT || 0) * 100,
+        amount_total: Number(existingOrder.ORDER_AMOUNT || 0) * 100,
+        payment_method_types: ['card'],
+        message: 'Order already processed',
+        shipping: {
+          address: {
+            line1: existingOrder.ADDRESS_STREET || '',
+            city: existingOrder.ADDRESS_TOWN || '',
+            postal_code: existingOrder.ADDRESS_ZIP || '',
+            country: existingOrder.ADDRESS_COUNTRY_CODE || 'CH'
+          }
+        }
+      });
     }
 
     // Extract line items and metadata
@@ -183,27 +249,6 @@ export async function GET(req: NextRequest) {
       SET DELIVERY_DATETIME = ${deliveryTime}
       WHERE BUSINESS_ORDER_ID = ${newOrder.BUSINESS_ORDER_ID}
     `;
-
-    // Check if we already processed this payment to prevent duplicates
-    // const existingOrder = await prisma.business_order.findFirst({
-    //   where: {
-    //     EMAIL_ADDRESS: session.customer_email || session.metadata?.customerEmail || '',
-    //     CREATION_DATETIME: {
-    //       gte: new Date(Date.now() - 5 * 60 * 1000) // Last 5 minutes
-    //     },
-    //     ORDER_AMOUNT: orderTotal
-    //   }
-    // });
-
-    // if (existingOrder) {
-    //   return NextResponse.json({ 
-    //     success: true, 
-    //     orderId: existingOrder.BUSINESS_ORDER_ID,
-    //     orderNumber: `ORD-${existingOrder.BUSINESS_ORDER_ID}`,
-    //     customerId: existingOrder.VISITOR_ID || undefined,
-    //     message: 'Order already processed'
-    //   });
-    // }
 
     // Get order items from line items
     const orderItems: OrderItem[] = [];

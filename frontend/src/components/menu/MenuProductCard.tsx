@@ -1,72 +1,130 @@
 "use client";
 
 import Image from "next/image";
-import AddToCartButton from "../core/AddToCartButton";
 import { MenuProduct } from "@/types/product";
+import DeliveryInfoModal from "./DeliveryInfoModal";
+import { useState } from "react";
+import { useCartStore } from "@/stores/cartStore";
+import Button from "../core/Button";
+import ProductDetailsModal from "./ProductDetailsModal";
 
 interface MenuProductCardProps {
   product: MenuProduct;
+  businessZipCode?: string;
 }
 
-export default function MenuProductCard({ product }: MenuProductCardProps) {
+export default function MenuProductCard({ product, businessZipCode }: MenuProductCardProps) {
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const { items, addToCart } = useCartStore();
+  const isInCart = items.some((item) => item.id === String(product.BUSINESS_PRODUCT_ID));
+
+  const handleAddToCart = (dontShowAgain: boolean) => {
+    if (dontShowAgain) {
+      localStorage.setItem('deliveryAcknowledged', 'true');
+    }
+    addToCart({
+      id: String(product.BUSINESS_PRODUCT_ID),
+      name: product.PRODUCT_NAME,
+      price: Number(product.PRODUCT_PRICE),
+      description: product.PRODUCT_DESCRIPTION || '',
+      image: product.PIC,
+      businessId: String(product.BUSINESS_ID)
+    });
+    setShowDeliveryModal(false);
+  };
+
+  const handleAddToCartClick = () => {
+    const hasAcknowledged = localStorage.getItem('deliveryAcknowledged') === 'true';
+    if (hasAcknowledged) {
+      handleAddToCart(false);
+    } else {
+      setShowDeliveryModal(true);
+    }
+  };
 
   return (
-    <div className="bg-white rounded-2xl border-2 border-primary shadow-md flex flex-col overflow-hidden transition hover:shadow-xl h-full">
-      {/* Image Container */}
-      <div className="relative w-full h-[220px] bg-gray-50">
-        {product.PIC ? (
-          <Image
-            src={product.PIC}
-            alt={product.PRODUCT_NAME}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 400px"
-            priority={false}
-          />
-        ) : (
-          <div className="flex items-center justify-center w-full h-full text-gray-400 text-sm">
-            No Image
-          </div>
-        )}
-      </div>
+    <>
+      <DeliveryInfoModal
+        showDeliveryInfoModal={showDeliveryModal}
+        setShowDeliveryInfoModal={setShowDeliveryModal}
+        businessZipCode={businessZipCode}
+        onProceed={handleAddToCart}
+      />
 
-      {/* Content */}
-      <div className="flex flex-col flex-1 p-4">
-        <h3
-          className="font-semibold text-base lg:text-lg text-gray-800 mb-1 truncate"
-          title={product.PRODUCT_NAME}
-        >
-          {product.PRODUCT_NAME}
-        </h3>
+      <ProductDetailsModal
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        product={product}
+        onAddToCart={handleAddToCartClick}
+        isInCart={isInCart}
+      />
 
-        <p className="text-sm text-text-main mb-2 line-clamp-2">
-          {product.PRODUCT_DESCRIPTION}
-        </p>
+      <div 
+        className="bg-white rounded-2xl border-2 border-primary shadow-md flex flex-col overflow-hidden transition hover:shadow-xl h-full cursor-pointer"
+        onClick={() => setShowDetailsModal(true)}
+      >
+        {/* Image Container */}
+        <div className="relative w-full h-[220px] bg-gray-50">
+          {product.PIC ? (
+            <Image
+              src={product.PIC}
+              alt={product.PRODUCT_NAME}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 400px"
+              priority={false}
+            />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full text-gray-400 text-sm">
+              No Image
+            </div>
+          )}
+        </div>
 
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-lg font-bold text-primary">
-            CHF {Number(product.PRODUCT_PRICE).toFixed(2)}
-          </span>
+        {/* Content */}
+        <div className="flex flex-col flex-1 p-4">
+          <h3
+            className="font-semibold text-base lg:text-lg text-gray-800 mb-1 truncate"
+            title={product.PRODUCT_NAME}
+          >
+            {product.PRODUCT_NAME}
+          </h3>
 
-          {product.COMPARE_AS_PRICE && Number(product.COMPARE_AS_PRICE) > 0 ? (
-            <span className="text-sm line-through text-gray-400">
-              CHF {Number(product.COMPARE_AS_PRICE).toFixed(2)}
+          <p className="text-sm text-text-main mb-2 line-clamp-2">
+            {product.PRODUCT_DESCRIPTION}
+          </p>
+
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-lg font-bold text-primary">
+              CHF {Number(product.PRODUCT_PRICE).toFixed(2)}
             </span>
-          ) : null}
-        </div>
 
-        {/* Footer */}
-        <div className="mt-auto">
-          <AddToCartButton
-            product={{
-              id: String(product.BUSINESS_PRODUCT_ID),
-              name: product.PRODUCT_NAME,
-              price: Number(product.PRODUCT_PRICE),
-              image: product.PIC,
-            }}
-          />
+            {product.COMPARE_AS_PRICE && Number(product.COMPARE_AS_PRICE) > 0 ? (
+              <span className="text-sm line-through text-gray-400">
+                CHF {Number(product.COMPARE_AS_PRICE).toFixed(2)}
+              </span>
+            ) : null}
+          </div>
+
+          {/* Footer */}
+          <div className="mt-auto">
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToCartClick();
+              }}
+              className={`w-full text-white transition-colors ${
+                isInCart
+                  ? 'bg-secondary hover:bg-secondary-dark cursor-not-allowed opacity-70'
+                  : 'bg-primary hover:bg-primary-dark'
+              }`}
+            >
+              {isInCart ? 'Added to Cart' : 'Add to Cart'}
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

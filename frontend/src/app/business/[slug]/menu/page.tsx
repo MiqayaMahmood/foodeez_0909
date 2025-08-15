@@ -124,7 +124,7 @@ export default function MenuPage() {
           Object.entries(menuByCategory).map(
             ([category, products], idx, arr) => (
               <div key={category}>
-                <MenuCategorySection category={category} products={products} />
+                <MenuCategorySection category={category} products={products} businessZipCode={business?.ADDRESS_ZIP?.toString() || ''} />
                 {idx < arr.length - 1 && (
                   <hr
                     className="my-12 border-t-2 border-background-muted"

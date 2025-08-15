@@ -8,6 +8,8 @@ export interface CartItem {
   price: number;
   quantity: number;
   image?: string;
+  description?: string;
+  businessId?: string;
 }
 
 // Define the state structure for the cart

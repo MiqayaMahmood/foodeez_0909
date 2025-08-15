@@ -61,7 +61,7 @@ export default function ProfileDropdown({ session }: ProfileDropdownProps) {
 
   const items = [
     { label: "My Dashboard", href: "/dashboard", icon: <UserIcon className="w-4 h-4 mr-2" /> },
-    { label: "My Orders", href: "/dashboard/orders", icon: <Package className="w-4 h-4 mr-2" /> },
+    // { label: "My Orders", href: "/dashboard/orders", icon: <Package className="w-4 h-4 mr-2" /> },
     { label: "Update Profile", href: "/dashboard/profile", icon: <Settings className="w-4 h-4 mr-2" /> },
     {
       label: "Sign Out",

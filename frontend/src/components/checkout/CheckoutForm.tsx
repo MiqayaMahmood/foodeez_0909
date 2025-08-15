@@ -23,7 +23,7 @@ export default function CheckoutForm() {
   const { items, totalPrice, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
+
   // Initialize form with user data if authenticated
   const [formData, setFormData] = useState<CheckoutFormData>({
     firstName: '',
@@ -55,7 +55,7 @@ export default function CheckoutForm() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;
     const checked = (e.target as HTMLInputElement).checked;
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
@@ -88,7 +88,7 @@ export default function CheckoutForm() {
 
       const { sessionId } = await response.json();
       const stripe = await getStripe();
-      
+
       if (stripe) {
         const { error } = await stripe.redirectToCheckout({ sessionId });
         if (error) {
@@ -228,36 +228,40 @@ export default function CheckoutForm() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
               >
                 <option value="Switzerland">Switzerland</option>
-                <option value="Germany">Germany</option>
-                <option value="France">France</option>
-                <option value="Italy">Italy</option>
-                <option value="Austria">Austria</option>
               </select>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-6">Additional Information</h2>
-        {/* <div>
-          <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
-            Order Notes (Optional)
-          </label>
-          <textarea
-            id="notes"
-            name="notes"
-            value={formData.notes}
-            onChange={handleChange}
-            rows={3}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-            placeholder="Notes about your order, e.g. special delivery instructions"
-          />
-        </div> */}
-        
-        {isAuthenticated && (
-          <div className="mt-4">
-            <div className="flex items-center">
+      {isAuthenticated && (
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <>
+            <h2 className="text-xl font-semibold mb-6">Additional Information</h2>
+
+            {/* Order Notes Section (Optional) */}
+            {/* Uncomment if you want to use later
+      <div className="mb-4">
+        <label
+          htmlFor="notes"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Order Notes (Optional)
+        </label>
+        <textarea
+          id="notes"
+          name="notes"
+          value={formData.notes}
+          onChange={handleChange}
+          rows={3}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+          placeholder="Notes about your order, e.g. special delivery instructions"
+        />
+      </div>
+      */}
+
+            {/* Save Info Checkbox */}
+            <div className="mt-4 flex items-center">
               <input
                 id="saveInfo"
                 name="saveInfo"
@@ -266,13 +270,17 @@ export default function CheckoutForm() {
                 onChange={handleChange}
                 className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
               />
-              <label htmlFor="saveInfo" className="ml-2 block text-sm text-gray-700">
+              <label
+                htmlFor="saveInfo"
+                className="ml-2 block text-sm text-gray-700"
+              >
                 Save this information for next time
               </label>
             </div>
-          </div>
-        )}
-      </div>
+          </>
+        </div>
+      )}
+
 
       <div className="flex justify-end">
         <button

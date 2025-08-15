@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
       saveInfo: customerInfo.saveInfo.toString(),
     };
 
-    // Create a customer in Stripe (optional but recommended)
+    // Create a customer in Stripe with address information
     let customer: Stripe.Customer | null = null;
     if (customerInfo.email) {
       // Check if customer already exists
@@ -99,11 +99,48 @@ export async function POST(req: NextRequest) {
 
       if (existingCustomers.data.length > 0) {
         customer = existingCustomers.data[0];
+        // Update existing customer with new address info
+        customer = await stripe.customers.update(customer.id, {
+          name: `${customerInfo.firstName} ${customerInfo.lastName}`,
+          phone: customerInfo.phone,
+          address: {
+            line1: customerInfo.street,
+            city: customerInfo.city,
+            postal_code: customerInfo.zip,
+            country: customerInfo.country === 'Switzerland' ? 'CH' : customerInfo.country,
+          },
+          shipping: {
+            name: `${customerInfo.firstName} ${customerInfo.lastName}`,
+            phone: customerInfo.phone,
+            address: {
+              line1: customerInfo.street,
+              city: customerInfo.city,
+              postal_code: customerInfo.zip,
+              country: customerInfo.country === 'Switzerland' ? 'CH' : customerInfo.country,
+            },
+          },
+        });
       } else {
         customer = await stripe.customers.create({
           email: customerInfo.email,
           name: `${customerInfo.firstName} ${customerInfo.lastName}`,
           phone: customerInfo.phone,
+          address: {
+            line1: customerInfo.street,
+            city: customerInfo.city,
+            postal_code: customerInfo.zip,
+            country: customerInfo.country === 'Switzerland' ? 'CH' : customerInfo.country,
+          },
+          shipping: {
+            name: `${customerInfo.firstName} ${customerInfo.lastName}`,
+            phone: customerInfo.phone,
+            address: {
+              line1: customerInfo.street,
+              city: customerInfo.city,
+              postal_code: customerInfo.zip,
+              country: customerInfo.country === 'Switzerland' ? 'CH' : customerInfo.country,
+            },
+          },
           metadata: {
             userId: userId || 'guest',
             address: metadata.deliveryAddress,
@@ -112,28 +149,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Create checkout session
-    const session = await stripe.checkout.sessions.create({
+    // Create checkout session configuration
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       line_items,
       mode: 'payment',
       success_url: `${origin}/order/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/cart`,
-      customer: customer?.id,
       client_reference_id: userId || undefined,
       metadata,
-      shipping_address_collection: {
-        allowed_countries: ['CH'],
-      },
-      // phone_number_collection: {
-      //   enabled: true,
-      // },
-      // customer_update: {
-      //   address: 'auto',
-      //   name: 'auto',
-      // },
       submit_type: 'pay',
-      billing_address_collection: 'required',
       shipping_options: [
         {
           shipping_rate_data: {
@@ -156,7 +181,37 @@ export async function POST(req: NextRequest) {
           },
         },
       ],
-    });
+    };
+
+    // If we have a customer with address info, use it and don't collect address again
+    if (customer?.id) {
+      sessionConfig.customer = customer.id;
+      // Don't collect shipping address since customer already has it
+      sessionConfig.shipping_address_collection = undefined;
+      // Don't collect billing address since customer already has it
+      sessionConfig.billing_address_collection = undefined;
+      // Allow automatic updates to customer info
+      sessionConfig.customer_update = {
+        address: 'auto',
+        name: 'auto',
+        shipping: 'auto',
+      };
+    } else {
+      // For guest users without customer record, collect addresses
+      sessionConfig.customer_email = customerInfo.email;
+      sessionConfig.shipping_address_collection = {
+        allowed_countries: ['CH'],
+      };
+      sessionConfig.billing_address_collection = 'required';
+    }
+
+    // Always enable phone collection for verification
+    sessionConfig.phone_number_collection = {
+      enabled: true,
+    };
+
+    // Create the session
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     return NextResponse.json({ 
       sessionId: session.id,

@@ -24,16 +24,17 @@ export default function DashboardPage() {
   // Quick actions
   const quickActions = [
     {
-      title: "My Orders",
-      description: "View your order history",
-      icon: Package,
-      href: "/dashboard/orders",
-    },
-    {
       title: "Update Profile",
       description: "Keep your information current",
       icon: Settings,
       href: "/dashboard/profile",
+    },
+    {
+      title: "My Orders",
+      description: "View your order history",
+      icon: Package,
+      href: "/dashboard/orders",
+      isComingSoon: true,
     },
     {
       title: "Favorites",
