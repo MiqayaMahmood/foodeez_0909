@@ -63,7 +63,7 @@ function SignInContent() {
       router.refresh();
     } catch (err) {
       setErrorMessage("An error occurred. Please try again.");
-      console.error("Sign in error:", err);
+      console.error("Log in error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -73,8 +73,8 @@ function SignInContent() {
     try {
       await signIn("google", { callbackUrl });
     } catch (err) {
-      setErrorMessage("Failed to sign in with Google");
-      console.error("Google sign in error:", err);
+      setErrorMessage("Failed to Log in with Google");
+      console.error("Google Log in error:", err);
     }
   };
 
@@ -161,7 +161,7 @@ function SignInContent() {
             isLoading={isLoading}
             className="py-2.5"
           >
-            Sign in
+            Log in
           </Button>
 
           <div className="relative">
@@ -181,7 +181,7 @@ function SignInContent() {
             className="py-2.5"
           >
             <FcGoogle className="w-5 h-5 mr-2" />
-            Sign in with Google
+            Log in with Google
           </Button>
         </form>
       </div>
@@ -193,8 +193,8 @@ export default function SignIn() {
   return (
     <>
       <SEO
-        title="Sign in"
-        description="Sign in to your Foodeez account."
+        title="Log in"
+        description="Log in to your Foodeez account."
         url="https://foodeez.ch/auth/signin"
         canonical="https://foodeez.ch/auth/signin"
         noindex

@@ -38,7 +38,7 @@ const ShareExperience = () => {
 
       {/* CTA Button */}
       <div>
-        <Link href="/business/register" passHref>
+        <Link href="/business/register" passHref target="_blank">
           <button className="px-8 py-3 sm:px-10 sm:py-4 text-lg font-semibold rounded-full bg-primary text-white hover:bg-primary-dark shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
             Register Now
           </button>

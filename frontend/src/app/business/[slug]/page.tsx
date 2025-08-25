@@ -25,7 +25,6 @@ const BusinessDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [googleBusinessData, setGoogleBusinessData] = useState<BusinessGoogleData>();
   const [googleDataLoading, setGoogleDataLoading] = useState(false);
-  const [googleDataError, setGoogleDataError] = useState<string | null>(null);
 
   const genSlug = generateSlug(
     business?.BUSINESS_NAME || "business",
@@ -50,7 +49,7 @@ const BusinessDetailPage = () => {
 
     const fetchGoogleData = async () => {
       setGoogleDataLoading(true);
-      setGoogleDataError(null);
+  
 
       try {
         const response = await fetch(`/api/business-google-data/${business.BUSINESS_ID}`);
@@ -71,9 +70,6 @@ const BusinessDetailPage = () => {
         }
       } catch (error) {
         console.error("Error fetching Google place details:", error);
-        if (isMounted) {
-          setGoogleDataError(error instanceof Error ? error.message : 'Failed to load Google data');
-        }
       } finally {
         if (isMounted) {
           setGoogleDataLoading(false);
@@ -102,7 +98,7 @@ const BusinessDetailPage = () => {
 
   return (
     <>
-      
+
       <div className="">
         <ResturantProfilePageHeader
           BUSINESS_NAME={business.BUSINESS_NAME || ""}
@@ -124,21 +120,20 @@ const BusinessDetailPage = () => {
           {/* Info Section */}
           <BusinessInfoSection business={business} genSlug={genSlug} />
 
-          <Separator />
+
 
           {googleDataLoading ? (
             <div className="flex justify-center items-center py-8">
-              <div className="text-gray-500">Loading Google photos...</div>
-            </div>
-          ) : googleDataError ? (
-            <div className="text-red-500 text-center py-4">
-              Error loading photos: {googleDataError}
+              <div className="text-text-main">Loading Google photos...</div>
             </div>
           ) : (
+
+
             <GooglePhotoGallery
               photos={googleBusinessData?.photos || []}
               businessName={googleBusinessData?.name || business.BUSINESS_NAME || ''}
             />
+
           )}
 
           {/* Opening Hours */}
@@ -147,26 +142,13 @@ const BusinessDetailPage = () => {
               <div className="text-gray-500">Loading opening hours...</div>
             </div>
           ) : (
+
             <OpeningHours
               openingHours={googleBusinessData?.openingHours || []}
               isOpenNow={googleBusinessData?.isOpenNow || false}
             />
+
           )}
-
-          {/* Action Buttons */}
-          {/* <ActionButtons
-            onFavorite={() => {
-              console.log("Favorite status:");
-            }}
-            onShare={() => {
-              console.log("Share button clicked");
-            }}
-            onReview={() => {
-              console.log("Review button clicked");
-            }}
-          /> */}
-
-          <Separator />
 
           {/* Reviews */}
           <div className="">
@@ -185,9 +167,7 @@ const BusinessDetailPage = () => {
             )}
           </div>
 
-          <Separator />
-
-
+          <Separator className="mb-0" />
           <MapCard placeId={business.PLACE_ID || ''} />
 
         </div>

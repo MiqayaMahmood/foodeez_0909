@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReviewCard from "./ReviewCard";
 import { useSession } from "next-auth/react";
 import { foodeez_review_view } from "@prisma/client";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ReviewsGridProps {
   reviews: foodeez_review_view[];
@@ -22,10 +23,45 @@ const ReviewsGrid: React.FC<ReviewsGridProps> = ({
   showUserReviews = false,
 }) => {
   const { data: session } = useSession();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftButton, setShowLeftButton] = useState(false);
+  const [showRightButton, setShowRightButton] = useState(true);
 
   const isOwner = (review: foodeez_review_view) => {
     return session?.user?.email === review.REVIEWER_EMAIL;
   };
+
+  const checkScrollPosition = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setShowLeftButton(scrollLeft > 0);
+      setShowRightButton(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const scrollAmount = scrollRef.current.clientWidth * 0.9;
+      scrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+  
+      // check immediately for instant button visibility update
+      requestAnimationFrame(checkScrollPosition);
+    }
+  };
+  
+  useEffect(() => {
+    checkScrollPosition();
+    const ref = scrollRef.current;
+    if (ref) {
+      ref.addEventListener("scroll", checkScrollPosition);
+    }
+    return () => {
+      if (ref) ref.removeEventListener("scroll", checkScrollPosition);
+    };
+  }, []);
 
   if (isLoading) {
     return (
@@ -64,9 +100,26 @@ const ReviewsGrid: React.FC<ReviewsGridProps> = ({
 
   return (
     <div className="relative">
-      {/* Horizontal Scrollable Container */}
+      {/* Left Button */}
+      <AnimatePresence>
+        {showLeftButton && (
+          <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            onClick={() => scroll("left")}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-primary shadow-lg rounded-full p-3 "
+          >
+            <ChevronLeft className="w-6 h-6 text-white" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Scrollable Container */}
       <div
-        className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide"
+        ref={scrollRef}
+        className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide scroll-smooth"
         id="no-scrollbar"
       >
         <AnimatePresence>
@@ -94,6 +147,22 @@ const ReviewsGrid: React.FC<ReviewsGridProps> = ({
           ))}
         </AnimatePresence>
       </div>
+
+      {/* Right Button */}
+      <AnimatePresence>
+        {showRightButton && (
+          <motion.button
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+            onClick={() => scroll("right")}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-primary shadow-lg rounded-full p-3 "
+          >
+            <ChevronRight className="w-6 h-6 text-white" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

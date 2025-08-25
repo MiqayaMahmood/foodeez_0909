@@ -40,11 +40,13 @@ const faqs: FaqItem[] = [
   {
     question: "Can Foodeez help set up Google Maps and Instagram for my restaurant?",
     answer:
-      `<ul class='list-disc pl-5 space-y-1'>
+    `<p>Yes, we can help Digitalize your Business as:</p>
+      <ul class='list-disc pl-5 space-y-1'>
         <li>Google My Business creation or optimization</li>
         <li>Instagram and Facebook setup or refresh</li>
-        <li>Help creating your first social media posts or reels</li>
-      </ul>`
+        <li>Help creating your first social media posts or reels <a href="/contact" target="_blank" class="hover:underline font-bold text-secondary">Contact Us.</a></li>
+      </ul>
+      `
   },
   {
     question: "How will Foodeez help bring more customers?",
@@ -59,7 +61,7 @@ const faqs: FaqItem[] = [
   {
     question: "How do I sign up?",
     answer:
-      `You can register your business in just a few minutes at <a href='https://www.foodeez.ch/business' class='text-primary underline' target='_blank'>www.foodeez.ch/business</a><br/>Or email us at <a href='mailto:hello@foodeez.ch' class='text-primary underline'>hello@foodeez.ch</a> and we'll help you onboard.`
+      `You can register your business in just a few minutes at <a href='https://www.foodeez.ch/business/register' class='text-primary underline' target='_blank'>www.foodeez.ch/business/register</a><br/>Or email us at <a href='mailto:hello@foodeez.ch' class='text-primary underline'>hello@foodeez.ch</a> and we'll help you onboard.`
   },
   {
     question: "Is there support if I need help?",
@@ -125,7 +127,7 @@ const faqs: FaqItem[] = [
         <li>Wine producer</li>
         <li>Local farmer or spice maker</li>
       </ul>
-      <p>...you can create a producer listing and promote your goods to tourists and food lovers.</p>`
+      <p>...you can create a producer listing and promote your goods to tourists and food lovers. <a href="/contact" target="_blank" class="hover:underline font-bold text-secondary">Contact Us</a></p>`
   },
   {
     question: "How can I promote my products through Foodeez?",

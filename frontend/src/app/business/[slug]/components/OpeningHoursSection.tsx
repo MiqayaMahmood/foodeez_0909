@@ -1,4 +1,5 @@
 // components/OpeningHours.tsx
+import Separator from "@/components/ui/separator";
 import { OpeningHourDay } from "@/types/google-business";
 import { format } from "date-fns";
 import { Clock } from "lucide-react";
@@ -18,6 +19,8 @@ const OpeningHours: React.FC<OpeningHoursProps> = ({
   const currentDay = format(new Date(), "EEEE"); // Get current day as full name
 
   return (
+    <>
+    <Separator />
     <div className="py-8 px-4 lg:px-0">
       <div className="">
         {/* Title Section */}
@@ -71,6 +74,7 @@ const OpeningHours: React.FC<OpeningHoursProps> = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -10,10 +10,10 @@ import { toast } from 'react-hot-toast';
 export default function Footer() {
   const socialLinks = {
     facebook: "https://facebook.com/foodeez.ch",
-    instagram: "https://facebook.com/foodeez.ch",
-    whatsapp: "https://facebook.com/foodeez.ch",
-    twitter: "https://facebook.com/foodeez.ch",
-    tiktok: "https://facebook.com/@foodeez.ch",
+    instagram: "https://www.instagram.com/foodeez.ch",
+    whatsapp: "https://wa.me/+41764089430",
+    twitter: "https://twitter.com/foodeez.ch",
+    tiktok: "https://www.tiktok.com/@foodeez.ch",
   };
 
   const [email, setEmail] = useState("");
@@ -62,16 +62,14 @@ export default function Footer() {
             </h3>
             <p className="">Join our community and share your experiences</p>
           </div>
-          {/* <Link
-            href="/signup"
+          <Link
+            href="/auth/signup"
+            target="_blank"
             className="mt-4 md:mt-0 inline-flex items-center px-6 py-3 bg-white text-primary font-medium rounded-full hover:bg-gray-100 transition-colors"
           >
             Share your experience
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Link> */}
-          <div className="mt-4 md:mt-0 inline-flex items-center px-6 py-3 bg-white text-primary font-medium rounded-full hover:bg-gray-100 transition-colors">
-            Share your experience
-          </div>
+          </Link>
+          
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
@@ -140,18 +138,12 @@ export default function Footer() {
 
             <ul className="space-y-3">
               <li>
-                <Link href="#" className="font-medium">
+                <Link href="/auth/signup" className="">
                   Register Now
                 </Link>
               </li>
               <li>
-                <Link href="#">Contact Us</Link>
-              </li>
-              <li>
-                <Link href="#">Advertise </Link>
-              </li>
-              <li>
-                <Link href="#">Subscribe</Link>
+                <Link href="/contact">Contact Us</Link>
               </li>
             </ul>
             {/* Newsletter */}
@@ -197,9 +189,8 @@ export default function Footer() {
             © {new Date().getFullYear()} Foodeez. All rights reserved.
           </div>
           <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-            <Link href="#">Terms of Service</Link>
-            <Link href="#">Privacy Policy</Link>
-            <Link href="#">Cookie Policy</Link>
+            <Link target="_blank" href="/terms-and-conditions">Terms and Conditions</Link>
+            <Link target="_blank" href="/privacy-policy">Privacy Policy</Link>
           </div>
         </div>
       </div>

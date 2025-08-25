@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/core/Button";
+// import { Button } from "@/components/core/Button";
 import { motion } from "framer-motion";
 import {
   HelpCircle,
@@ -8,6 +8,7 @@ import {
   MessageCircle,
   Image as ImageIcon,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function CommunitySection() {
   const containerVariants = {
@@ -43,12 +44,12 @@ export default function CommunitySection() {
         className="max-w-5xl w-full flex flex-col md:flex-row gap-6 mb-14"
         variants={itemVariants}
       >
-        <Button className="flex-1 bg-primary hover:bg-primary-dark text-white text-lg sm:text-xl py-4 px-6 rounded-2xl shadow-md transform transition-all hover:-translate-y-1 hover:scale-105">
+        <Link href="/food-journey" target="_blank" className="text-center flex-1 bg-primary hover:bg-primary-dark text-white text-lg sm:text-xl py-4 px-6 rounded-2xl shadow-md transform transition-all hover:-translate-y-1 hover:scale-105">
           Know a hidden gem? Recommend it!
-        </Button>
-        <Button className="flex-1 bg-secondary hover:bg-secondary-dark text-white text-lg sm:text-xl py-4 px-6 rounded-2xl shadow-md transform transition-all hover:-translate-y-1 hover:scale-105">
+        </Link>
+        <Link href="/contact" target="_blank" className="text-center flex-1 bg-secondary hover:bg-secondary-dark text-white text-lg sm:text-xl py-4 px-6 rounded-2xl shadow-md transform transition-all hover:-translate-y-1 hover:scale-105">
           Help us serve better! Tell us what's missing.
-        </Button>
+        </Link>
       </motion.div>
 
       {/* Divider */}
@@ -144,18 +145,18 @@ export default function CommunitySection() {
         </span>
         <span className="text-center sm:text-left">
           Help us test new features –{" "}
-          <span className="font-bold text-secondary">Feedback wanted!</span>
+          <Link href="/contact" target="_blank" className="hover:underline font-bold text-secondary">Feedback wanted!</Link>
         </span>
       </motion.div>
 
       {/* Final CTA */}
-      <motion.div className="mt-6" variants={itemVariants}>
+      {/* <motion.div className="mt-6" variants={itemVariants}>
         <Button className="bg-primary hover:bg-primary-dark text-white text-xl px-10 py-4 rounded-full shadow-xl border border-primary-dark transform transition-all hover:scale-105"
         disabled
         >
           Join Foodeez Community Now!
         </Button>
-      </motion.div>
+      </motion.div> */}
     </motion.section>
   );
 }

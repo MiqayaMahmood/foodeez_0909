@@ -61,7 +61,7 @@ export default function SignUp() {
         throw new Error(data.message || "Something went wrong");
       }
 
-      // Sign in the user after successful registration
+      // Log in the user after successful registration
       const result = await signIn("credentials", {
         email: formData.email,
         password: formData.password,
@@ -70,7 +70,7 @@ export default function SignUp() {
 
 
       if (result?.error) {
-        setError("Failed to sign in after registration");
+        setError("Failed to Log in after registration");
         return;
       }
 
@@ -88,8 +88,8 @@ export default function SignUp() {
     try {
       await signIn("google", { callbackUrl: "/" });
     } catch (err) {
-      setError("Failed to sign in with Google");
-      console.error("Google sign in error:", err);
+      setError("Failed to Log in with Google");
+      console.error("Google Log in error:", err);
     }
   };
 
@@ -125,7 +125,7 @@ export default function SignUp() {
               href="/auth/signin"
               className="font-medium text-primary hover:text-primary-dark transition-colors"
             >
-              Sign in
+              Log in
             </Link>
           </p>
         </div>

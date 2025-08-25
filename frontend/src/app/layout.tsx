@@ -62,7 +62,6 @@ const defaultMetadata: Metadata = {
     apple: '/images/Logo/LogoFoodeezMain.svg',
     shortcut: '/images/Logo/LogoFoodeezMain.svg',
   },
-  manifest: '/site.webmanifest',
 };
 
 export default function RootLayout({

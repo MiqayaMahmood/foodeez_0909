@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Camera } from "lucide-react";
 import { GooglePhoto } from "@/types/google-business";
+import Separator from "@/components/ui/separator";
 
 interface GooglePhotoGalleryProps {
   photos: GooglePhoto[];
@@ -12,18 +13,22 @@ export default function GooglePhotoGallery({
   photos,
   businessName,
 }: GooglePhotoGalleryProps) {
-  if (!photos || photos.length === 0) {
-    return (
-      <div className="p-6 text-center text-gray-500 border border-dashed border-gray-300 rounded-lg">
-        <p className="text-lg">😕 No photos available</p>
-        <p className="text-sm mt-2 text-gray-400">
-          We're working on adding images for {businessName || "this place"}.
-        </p>
-      </div>
-    );
-  }
+  // if (!photos || photos.length === 0) {
+  //   return (
+  //     <div className="p-6 text-center text-gray-500 border border-dashed border-gray-300 rounded-lg">
+  //       <p className="text-lg">😕 No photos available</p>
+  //       <p className="text-sm mt-2 text-gray-400">
+  //         We're working on adding images for {businessName || "this place"}.
+  //       </p>
+  //     </div>
+  //   );
+  // }
+
+  if (!photos || photos.length === 0) return null;
 
   return (
+    <>
+    <Separator />
     <div className="py-8 px-4 lg:px-0">
       <div className="flex items-center sub-heading !mb-10">
         <h2 className="">
@@ -51,5 +56,6 @@ export default function GooglePhotoGallery({
         ))}
       </div>
     </div>
+    </>
   );
 }

@@ -7,42 +7,75 @@ import Link from "next/link";
 
 interface FaqItem {
   question: string;
-  answer: string;
+  answer: React.ReactNode; // allow JSX
+}
+
+interface FaqItem {
+  question: string;
+  answer: React.ReactNode;
 }
 
 const faqs: FaqItem[] = [
   {
     question: "What is Foodeez?",
-    answer:
-      "Foodeez is a food discovery platform designed to connect local restaurants, cafés, and takeaways in Switzerland with tourists and food lovers actively searching for places to eat. We help your business get discovered — online and in person.",
+    answer: (
+      <p>
+        Foodeez is a food discovery platform designed to connect local
+        restaurants, cafés, and takeaways in Switzerland with tourists and food
+        lovers actively searching for places to eat. We help your business get
+        discovered — online and in person.
+      </p>
+    ),
   },
   {
     question: "Who can join Foodeez?",
-    answer:
-      "Any food business in Switzerland — including restaurants, takeaways, cafés, food trucks, bakeries, or specialty stores — is welcome to join, whether you're well-known or just starting out.",
+    answer: (
+      <p>
+        Any food business in Switzerland — including restaurants, takeaways,
+        cafés, food trucks, bakeries, or specialty stores — is welcome to join,
+        whether you're well-known or just starting out.
+      </p>
+    ),
   },
   {
     question: "Why should I register my business on Foodeez?",
-    answer: `<ul class='list-disc pl-5 space-y-1'>
+    answer: (
+      <ul className="list-disc pl-5 space-y-1">
         <li>Get discovered on our map and food app</li>
         <li>Reach tourists in your area</li>
         <li>Improve your online visibility (Google, Instagram, etc.)</li>
         <li>Access free and premium marketing services</li>
-      </ul>`,
+      </ul>
+    ),
   },
   {
     question: "Do I need to be on Google or Instagram to join?",
-    answer:
-      "No — in fact, Foodeez helps you get there! If you're not yet visible online, our Premium plan includes setup for Google My Business and social media accounts, at no extra cost during your first year.",
+    answer: (
+      <p>
+        No — in fact, Foodeez helps you get there! If you're not yet visible
+        online, our Premium plan includes setup for Google My Business and
+        social media accounts, at no extra cost during your first year.
+      </p>
+    ),
   },
   {
-    question:
-      "Can Foodeez help set up Google Maps and Instagram for my restaurant?",
-    answer: `<ul class='list-disc pl-5 space-y-1'>
+    question: "Can Foodeez help set up Google Maps and Instagram for my restaurant?",
+    answer: (
+      <ul className="list-disc pl-5 space-y-1">
         <li>Google My Business creation or optimization</li>
         <li>Instagram and Facebook setup or refresh</li>
         <li>Help creating your first social media posts or reels</li>
-      </ul>`,
+      
+          <Link
+            href="/pricing"
+            target="_blank"
+            className="hover:underline font-bold text-secondary"
+          >
+            View Premium Plan
+          </Link>
+      
+      </ul>
+    ),
   },
 ];
 
@@ -90,17 +123,17 @@ export default function FaqSection() {
 
               <AnimatePresence>
                 {openIndex === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div
-                      className="px-6 pb-6 pt-0 border-t border-gray-100 text-text-main text-base md:text-lg bg-white"
-                      dangerouslySetInnerHTML={{ __html: faq.answer }}
-                    />
-                  </motion.div>
+                 <motion.div
+                 initial={{ height: 0, opacity: 0 }}
+                 animate={{ height: "auto", opacity: 1 }}
+                 exit={{ height: 0, opacity: 0 }}
+                 transition={{ duration: 0.3 }}
+               >
+                 <div className="px-6 pb-6 pt-0 border-t border-gray-100 text-text-main text-base md:text-lg bg-white">
+                   {faq.answer}
+                 </div>
+               </motion.div>
+               
                 )}
               </AnimatePresence>
             </div>

@@ -110,7 +110,7 @@ const LoginRequiredModal: React.FC<LoginRequiredModalProps> = ({
             onClick={handleSignIn}
             className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
           >
-            Sign In
+            Log in
           </button>
           <button
             onClick={handleSignUp}

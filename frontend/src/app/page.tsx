@@ -67,7 +67,7 @@ export default function Home() {
 
         {/* FAQ Section */}
         <FaqSection />
-        <Separator />
+        <Separator className="mb-0" />
 
         {/* Map Section */}
         <GoogleMapsProvider>

@@ -4,8 +4,17 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/core/Button";
 import { motion } from "framer-motion"; // Import motion
 import SEO from "@/components/seo/SEO";
+import { useSession } from "next-auth/react";
+import LoginRequiredModal from "@/components/core/LoginRequiredModal";
+import { useState } from "react";
+import { checkBusinessOwnerExist } from "@/services/PricingPageService";
 
 export default function PricingPage() {
+  const session = useSession();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isBusinessOwnerFunctionLoading, setIsBusinessOwnerFunctionLoading] = useState(false);
+
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -24,8 +33,34 @@ export default function PricingPage() {
     visible: { opacity: 1, y: 0 },
   };
 
+  const handleGetPremium = async () => {
+
+    if (session.status === "unauthenticated") {
+      setShowLoginModal(true);
+    } else {
+      const user = session.data?.user;
+      if (user) {
+        setIsBusinessOwnerFunctionLoading(true);
+        const ifBusinessOwnerExist = await checkBusinessOwnerExist(Number(user.id))
+        setIsBusinessOwnerFunctionLoading(false);
+        if (ifBusinessOwnerExist) {
+          window.open('/contact', '_blank');
+        } else {
+          window.open('/business/register', '_blank');
+        }
+      }
+    }
+
+  };
+
   return (
     <>
+      <LoginRequiredModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        message="Please login to get premium"
+      />
+
       <SEO
         title="Pricing"
         description="Foodeez pricing plans: start free, upgrade to Premium for priority visibility, ads access, and more."
@@ -55,7 +90,7 @@ export default function PricingPage() {
 
         {/* Plans Section */}
         <motion.div
-          className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 mb-10"
+          className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 mb-10"
           variants={containerVariants}
         >
           {/* Basic Plan */}
@@ -93,7 +128,7 @@ export default function PricingPage() {
               ].map((feature) => (
                 <motion.li
                   key={feature}
-                  className="flex items-start gap-2 text-secondary"
+                  className="flex items-start gap-2 text-text-main"
                   variants={itemVariants}
                 >
                   <Check className="w-5 h-5 text-primary mt-1" />
@@ -101,7 +136,7 @@ export default function PricingPage() {
                 </motion.li>
               ))}
             </ul>
-            <span className="text-xs lg:text-base text-secondary mt-auto">
+            <span className="text-xs lg:text-base text-text-main mt-auto">
               Contacted via email & phone
             </span>
           </motion.div>
@@ -140,7 +175,7 @@ export default function PricingPage() {
               ].map((feature) => (
                 <motion.li
                   key={feature}
-                  className="flex items-start gap-2 text-secondary"
+                  className="flex items-start gap-2 text-text-main"
                   variants={itemVariants}
                 >
                   <Check className="w-5 h-5 text-primary-600 mt-1" />
@@ -148,8 +183,11 @@ export default function PricingPage() {
                 </motion.li>
               ))}
             </ul>
-            <Button className="mt-4" variant="primary" size="lg">
-              Get Premium
+            <Button className="mt-4" variant="primary" size="lg"
+              onClick={() => handleGetPremium()}
+
+            >
+              {isBusinessOwnerFunctionLoading ? "Loading..." : "Get Premium"}
             </Button>
           </motion.div>
         </motion.div>
@@ -159,14 +197,14 @@ export default function PricingPage() {
           className="w-full max-w-6xl rounded-2xl border border-secondary bg-secondary/5  p-6 mb-8 flex flex-col items-start"
           variants={itemVariants}
         >
-          <p className="font-medium text-lg lg:text-xl text-secondary mb-2">
+          <p className="font-medium text-lg lg:text-xl text-text-main mb-2">
             Not yet visible on Google Map & Social Media?{" "}
             <span className="font-normal">
               No worries - We can do that – One time setup cost,{" "}
               <span className="font-bold text-primary">CHF 49.-</span>
             </span>
           </p>
-          <ul className="space-y-2 text-base lg:text-lg ml-4 list-disc text-secondary">
+          <ul className="space-y-2 text-base lg:text-lg ml-4 list-disc text-text-main">
             <motion.li variants={itemVariants}>Setup Google Business Profile</motion.li>
             <motion.li variants={itemVariants}>Setup Facebook & Instagram Page</motion.li>
             <motion.li variants={itemVariants}>Integrate with foodeez Business profile</motion.li>
@@ -178,7 +216,7 @@ export default function PricingPage() {
           className="w-full max-w-5xl text-center mt-4"
           variants={itemVariants}
         >
-          <p className="text-lg lg:text-3xl text-secondary-dark italic animate-pulse">
+          <p className="text-lg lg:text-3xl text-secondary-dark italic ">
             Foodeez Food Ordering –{" "}
             <span className="font-semibold text-primary">Coming soon ...</span>
           </p>
