@@ -49,7 +49,7 @@ const BusinessDetailPage = () => {
 
     const fetchGoogleData = async () => {
       setGoogleDataLoading(true);
-  
+
 
       try {
         const response = await fetch(`/api/business-google-data/${business.BUSINESS_ID}`);
@@ -168,7 +168,9 @@ const BusinessDetailPage = () => {
           </div>
 
           <Separator className="mb-0" />
-          <MapCard placeId={business.PLACE_ID || ''} />
+          <div className="relative">
+            <MapCard placeId={business.PLACE_ID || ''} />
+          </div>
 
         </div>
       </div>

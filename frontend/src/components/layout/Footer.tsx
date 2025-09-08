@@ -22,7 +22,7 @@ export default function Footer() {
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     try {
       const response = await fetch('/api/subscribe', {
         method: 'POST',
@@ -31,15 +31,15 @@ export default function Footer() {
         },
         body: JSON.stringify({ email }),
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok || data.success === false) {
         const errorMessage = data?.message || 'Subscription failed. Please try again.';
         toast.error(errorMessage);
         return;
       }
-  
+
       toast.success(data.message || 'Successfully subscribed to our newsletter!');
       setEmail('');
     } catch (error) {
@@ -49,7 +49,7 @@ export default function Footer() {
       setIsLoading(false);
     }
   };
-  
+
 
   return (
     <footer className="bg-primary text-white pt-16 pb-8">
@@ -69,7 +69,7 @@ export default function Footer() {
           >
             Share your experience
           </Link>
-          
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
@@ -147,36 +147,36 @@ export default function Footer() {
               </li>
             </ul>
             {/* Newsletter */}
-          <div className="mt-10">
-            <h3 className="text-lg lg:text-xl font-semibold mb-5 text-text">Newsletter</h3>
-            <p className="mb-4 text-text">
-              Be the part of foodeez, to get the updates, blogs, new restaurants
-              & foods and offers.
-            </p>
-            <form onSubmit={handleSubscribe} className="relative">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your email address"
-                className="w-full px-4 py-3 text-primary border border-gray-400 rounded-lg text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                required
-                disabled={isLoading}
-              />
-              <button
-                type="submit"
-                className="absolute right-1 top-1 bottom-1 px-3 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Subscribe"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Send size={16} />
-                )}
-              </button>
-            </form>
-          </div>
+            <div className="mt-10">
+              <h3 className="text-lg lg:text-xl font-semibold mb-5 text-text">Newsletter</h3>
+              <p className="mb-4 text-text">
+                Be the part of foodeez, to get the updates, blogs, new restaurants
+                & foods and offers.
+              </p>
+              <form onSubmit={handleSubscribe} className="relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your email address"
+                  className="w-full px-4 py-3 text-primary border border-gray-400 rounded-lg text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="submit"
+                  className="absolute right-1 top-1 bottom-1 px-3 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Subscribe"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Send size={16} />
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
 
@@ -189,8 +189,10 @@ export default function Footer() {
             © {new Date().getFullYear()} Foodeez. All rights reserved.
           </div>
           <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-            <Link target="_blank" href="/terms-and-conditions">Terms and Conditions</Link>
+            <Link target="_blank" href="/terms-and-services">Terms and Services</Link>
             <Link target="_blank" href="/privacy-policy">Privacy Policy</Link>
+            <Link target="_blank" href="/usage-and-disclaimer">Usage and Disclaimer</Link>
+            <Link target="_blank" href="/impressum">Impressum</Link>
           </div>
         </div>
       </div>

@@ -1,96 +1,119 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 export default function PrivacyPolicyPage() {
   return (
-    <main className="px-6 lg:px-0 py-10 lg:py-20 text-gray-800">
-      {/* Heading */}
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-3xl md:text-5xl font-bold text-primary mb-8"
-      >
+    <main className="px-6 l py-10 lg:py-20 text-gray-800">
+      <h1 className="text-3xl md:text-5xl font-bold text-primary mb-8">
         Privacy Policy
-      </motion.h1>
-
+      </h1>
       <p className="text-gray-600 mb-12">
-        Last Updated: <strong>January 2025</strong>
+        Effective Date:&nbsp;
+        <span className="font-semibold">30.08.2025</span> <br />
+        Last Updated:&nbsp;
+        <span className="font-semibold">30.08.2025</span>
       </p>
 
       <div className="space-y-10 leading-relaxed text-base md:text-lg">
         <section>
-          <h2 className="text-xl md:text-2xl font-semibold mb-3">1. Information We Collect</h2>
+          <h2 className="text-xl md:text-2xl font-semibold mb-3">1. Introduction</h2>
+          <p>
+            Foodeez (&quot;we,&quot; &quot;our,&quot; &quot;us&quot;) respects
+            your privacy. This Privacy Policy explains how we collect, use, and
+            protect your personal data in compliance with the Swiss Federal Act
+            on Data Protection (FADP) and the GDPR.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl md:text-2xl font-semibold mb-3">2. Data We Collect</h2>
           <ul className="list-disc pl-6 space-y-1">
-            <li><strong>For Users:</strong> Name, email, location data.</li>
-            <li><strong>For Businesses:</strong> Business name, address, contact details, menus, and photos.</li>
-            <li><strong>Automatically:</strong> Device data, cookies, browsing activity.</li>
+            <li>
+              <span className="font-semibold">Account Data:</span> Name, email,
+              login credentials (if you sign up).
+            </li>
+            <li>
+              <span className="font-semibold">Location Data:</span> If you grant
+              permission, your approximate or precise location for
+              recommendations.
+            </li>
+            <li>
+              <span className="font-semibold">Usage Data:</span> Device details,
+              IP address, interactions, cookies.
+            </li>
+            <li>
+              <span className="font-semibold">Business Data:</span> Information
+              about restaurants collected from publicly available sources.
+            </li>
+            <li>
+              <span className="font-semibold">User Content:</span> Reviews,
+              ratings, and feedback.
+            </li>
           </ul>
         </section>
 
         <section>
-          <h2 className="text-xl md:text-2xl font-semibold mb-3">2. How We Use Information</h2>
+          <h2 className="text-xl md:text-2xl font-semibold mb-3">3. How We Use Your Data</h2>
           <p>
-            We use your data to connect food lovers with restaurants, improve our
-            services, and personalize your experience. We may also send relevant
-            promotions (with opt-out options).
+            To provide and personalize our Services.&nbsp; To recommend
+            businesses based on your preferences and location.&nbsp; To
+            communicate updates, notices, or offers.&nbsp; To maintain security
+            and prevent misuse.
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl md:text-2xl font-semibold mb-3">3. Sharing of Information</h2>
+          <h2 className="text-xl md:text-2xl font-semibold mb-3">4. Data Sharing</h2>
           <p>
-            We do not sell personal data. We may share information with hosting
-            providers, analytics platforms, and payment processors. Information
-            may be shared with legal authorities when required by law.
+            We do not sell your personal data.&nbsp; Data may be shared with
+            service providers (hosting, analytics, authentication).&nbsp;
+            Aggregated, anonymized data may be shared for research or
+            analytics.&nbsp; We may disclose information when legally required.
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl md:text-2xl font-semibold mb-3">4. Cookies & Tracking</h2>
+          <h2 className="text-xl md:text-2xl font-semibold mb-3">5. Storage &amp; Security</h2>
           <p>
-            Foodeez uses cookies to remember preferences, analyze traffic, and
-            improve our platform. Users can disable cookies in browser settings.
+            Data is stored on secure servers located in Switzerland and/or the
+            EU.&nbsp; We apply industry-standard security measures
+            (encryption,&nbsp; access controls).
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl md:text-2xl font-semibold mb-3">5. Data Retention</h2>
-          <p>
-            We retain your information as long as your account is active. You may
-            request deletion of your data at any time.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl md:text-2xl font-semibold mb-3">6. Security</h2>
-          <p>
-            We use encryption and secure servers to protect your data. However,
-            no system is 100% secure, and we cannot guarantee absolute security.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl md:text-2xl font-semibold mb-3">7. Your Rights</h2>
+          <h2 className="text-xl md:text-2xl font-semibold mb-3">6. GDPR &amp; FADP Rights</h2>
           <ul className="list-disc pl-6 space-y-1">
-            <li>Access the personal data we hold about you.</li>
-            <li>Request corrections to inaccurate data.</li>
-            <li>Request deletion of your data.</li>
-            <li>Opt out of marketing communications.</li>
+            <li>Access, correct, or delete your data.</li>
+            <li>Restrict or object to processing.</li>
+            <li>Withdraw consent at any time.</li>
+            <li>Request data portability.</li>
+            <li>
+              File a complaint with the Swiss Federal Data Protection and
+              Information Commissioner (FDPIC) or your local EU authority.
+            </li>
           </ul>
-        </section>
-
-        <section>
-          <h2 className="text-xl md:text-2xl font-semibold mb-3">8. Contact Us</h2>
-          <p>
-            For privacy-related inquiries, reach us at:{" "}
+          <p className="mt-4">
+            To exercise your rights, contact us at:&nbsp;
             <a
-              href="mailto:support@foodeez.ch"
-              className="font-semibold text-secondary hover:underline"
+              href="mailto:info@foodeez.ch"
+              className="text-secondary font-semibold hover:underline"
             >
-              support@foodeez.ch
+              info@foodeez.ch
             </a>
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl md:text-2xl font-semibold mb-3">7. Cookies</h2>
+          <p>
+            Foodeez uses cookies for analytics, personalization, and security.
+            You may disable cookies in your browser settings.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl md:text-2xl font-semibold mb-3">8. Policy Updates</h2>
+          <p>
+            We may update this Privacy Policy.&nbsp; The &quot;Last Updated&quot;
+            date will indicate changes.
           </p>
         </section>
       </div>
